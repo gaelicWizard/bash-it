@@ -53,6 +53,11 @@ RBENV_THEME_PROMPT_SUFFIX='|'
 RBFU_THEME_PROMPT_PREFIX=' |'
 RBFU_THEME_PROMPT_SUFFIX='|'
 
+BASH_THEME_LAST_CMD_FAILED='✗'
+BASH_THEME_LAST_CMD_SUCCESS='✓'
+
+BASH_THEME_IN_VIM_SHELL='(vim)'
+
 function scm {
   if [[ "$SCM_CHECK" = false ]]; then SCM=$SCM_NONE
   elif [[ -f .git/HEAD ]]; then SCM=$SCM_GIT
@@ -425,4 +430,34 @@ function safe_append_prompt_command {
             *) PROMPT_COMMAND="$1;$PROMPT_COMMAND";;
         esac
     fi
+}
+
+function last_cmd_info {
+	if [[ $? = 0 ]]; then
+		echo "${BASH_THEME_LAST_CMD_SUCCESS}"
+	else
+		echo "${BASH_THEME_LAST_CMD_FAILED}"
+	fi
+}
+
+function in_vim_shell {
+	if [[ -n "$VIM" ]]; then
+		echo "${BASH_THEME_IN_VIM_SHELL}"
+	fi
+}
+
+function user_info {
+	if [[ "$DISABLE_USER_INFO" != "true" || -n "$SSH_CONNECTION" ]]; then
+		if [ -n "$SUDO_USER" ]; then
+			echo "${SUDO_USER}[S] "
+		else
+			echo "$USER "
+		fi
+	fi
+}
+
+function remote_info {
+	if [ -n "$SSH_CONNECTION" ]; then
+		echo "@`echo $SSH_CONNECTION | awk '{ print $3 }'` "
+	fi
 }
