@@ -25,7 +25,7 @@ SCM_GIT_CHAR=' ±'
 SCM_NONE_CHAR=''
 
 function prompt_command() {
-PS1="$(last_cmd_info)$(in_vim_shell)${bold_yellow}|${bold_cyan}$(user_info)${bold_green}$(remote_info)${bold_blue}\W${bold_yellow}$(scm_char)${green}$(scm_prompt_info) ${bold_cyan}\$${reset_color} "
+PS1="$(last_cmd_info)$(in_vim_shell)${bold_yellow}|${bold_cyan}$(user_info)${bold_green}$(remote_info)${bold_blue}\W${bold_yellow}$(scm_char)${green}$(scm_prompt_info) ${bold_cyan}\$${normal} "
 }
 
 safe_append_prompt_command prompt_command
