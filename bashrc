@@ -37,8 +37,10 @@ export DISABLE_USER_INFO=true
 # Load Bash It
 source $BASH_IT/bash_it.sh
 
-export LANG="zh_CN.UTF-8"
-export LC_ALL="zh_CN.UTF-8"
+if [ -d /usr/share/locale/zh_CN.UTF-8 ]; then
+	export LANG="zh_CN.UTF-8"
+	export LC_ALL="zh_CN.UTF-8"
+fi
 
 unset LSCOLORS
 
