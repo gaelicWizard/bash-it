@@ -461,3 +461,10 @@ function remote_info {
 		echo "@`echo $SSH_CONNECTION | awk '{ print $3 }'` "
 	fi
 }
+
+function docker_info {
+	if [[ -n $(sed 's,.*\/$,,' /proc/1/cgroup) ]]; then
+		echo "${BASH_THEME_IN_DOCKER} "
+	fi
+}
+

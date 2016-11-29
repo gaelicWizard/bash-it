@@ -24,8 +24,10 @@ SCM_GIT_SHOW_CURRENT_USER=false
 SCM_GIT_CHAR=' ±'
 SCM_NONE_CHAR=''
 
+BASH_THEME_IN_DOCKER="${bold_yellow}[${bold_blue}D${bold_yellow}]"
+
 function prompt_command() {
-PS1="$(last_cmd_info)$(in_vim_shell)${bold_yellow}|${bold_cyan}$(user_info)${bold_green}$(remote_info)${bold_blue}\W${bold_yellow}$(scm_char)${green}$(scm_prompt_info) ${bold_cyan}\$${normal} "
+PS1="$(docker_info)$(last_cmd_info)$(in_vim_shell)${bold_yellow}|${bold_cyan}$(user_info)${bold_green}$(remote_info)${bold_blue}\W${bold_yellow}$(scm_char)${green}$(scm_prompt_info) ${bold_cyan}\$${normal} "
 }
 
 safe_append_prompt_command prompt_command
