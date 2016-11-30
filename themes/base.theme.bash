@@ -463,7 +463,7 @@ function remote_info {
 }
 
 function docker_info {
-	if [[ -n $(sed 's,.*\/$,,' /proc/1/cgroup) ]]; then
+	if [[ $OSTYPE =~ linux && -n $(sed 's,.*\/$,,' /proc/1/cgroup) ]]; then
 		echo "${BASH_THEME_IN_DOCKER} "
 	fi
 }

@@ -34,6 +34,11 @@ export SCM_CHECK=true
 # after enabling or disabling aliases, plugins, and completions.
 # export BASH_IT_AUTOMATIC_RELOAD_AFTER_CONFIG_CHANGE=1
 export DISABLE_USER_INFO=true
+
+if [ -z $OSTYPE ]; then
+	export OSTYPE=$(uname | tr [[:upper:]] [[:lower:]])
+fi
+
 # Load Bash It
 source $BASH_IT/bash_it.sh
 
@@ -56,7 +61,7 @@ alias lla="ls -la"
 alias lh="ls -lh"
 alias grep="grep --exclude 'tags' --exclude 'cscope.*' --binary-files=without-match --color=auto"
 
-if [ $(uname) = "Darwin" ]; then
+if [[ $OSTYPE =~ "darwin" ]]; then
 	PATH=$PATH:/opt/bin:/opt/my_scripts
 	if [[ -n ${CTPATH} ]]; then
 		PATH=$PATH:$CTPATH
@@ -85,7 +90,7 @@ if [ $(uname) = "Darwin" ]; then
 	alias pkgl="pkgutil --pkgs | grep -v \"^com\.apple\""
 	alias ls="ls -G -F"
 	alias GetBTMMAddr="echo show Setup:/Network/BackToMyMac | scutil | sed -n 's/.* : *\(.*\).$/\1/p'"
-elif [ $(uname) = "Linux" ]; then
+elif [[ $OSTYPE =~ "linux" ]]; then
 	alias ls="ls --color=auto"
 fi
 
