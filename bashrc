@@ -42,12 +42,15 @@ fi
 # Load Bash It
 source $BASH_IT/bash_it.sh
 
-if [ -d /usr/share/locale/zh_CN.UTF-8 ]; then
+if $(locale -a 2>/dev/null | grep -q zh_CN.UTF-8); then
 	export LANG="zh_CN.UTF-8"
 	export LC_ALL="zh_CN.UTF-8"
-else
+elif $(locale -a 2>/dev/null | grep -q en_US.UTF-8); then
 	export LANG="en_US.UTF-8"
 	export LC_ALL="en_US.UTF-8"
+else
+	export LANG="POSIX"
+	export LC_ALL="POSIX"
 fi
 
 unset LSCOLORS
