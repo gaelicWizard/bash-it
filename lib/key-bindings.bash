@@ -1,2 +1,4 @@
-bind 'TAB:menu-complete'
-bind 'set show-all-if-ambiguous on'
+if [[ $- =~ i ]]; then
+	bind 'set show-all-if-ambiguous on'
+	bind 'TAB:menu-complete'
+fi
