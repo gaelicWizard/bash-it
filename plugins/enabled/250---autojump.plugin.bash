@@ -1,0 +1,1 @@
+../available/autojump.plugin.bash
