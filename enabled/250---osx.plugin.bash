@@ -1,0 +1,1 @@
+../plugins/available/osx.plugin.bash

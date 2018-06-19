@@ -1,0 +1,1 @@
+../plugins/available/git-subrepo.plugin.bash
