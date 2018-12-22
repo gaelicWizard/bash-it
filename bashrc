@@ -62,7 +62,7 @@ alias la="ls -a"
 alias ll="ls -l"
 alias lla="ls -la"
 alias lh="ls -lh"
-alias grep="grep --exclude 'tags' --exclude 'cscope.*' --binary-files=without-match --color=auto"
+alias grep="grep -n --exclude 'tags' --exclude 'cscope.*' --binary-files=without-match --color=auto"
 
 if [[ $OSTYPE =~ "darwin" ]]; then
 	PATH=$PATH:/opt/bin:/opt/my_scripts
