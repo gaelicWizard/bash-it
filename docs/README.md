@@ -1,6 +1,7 @@
 # Bash-it
 ![Build Status](https://github.com/Bash-it/bash-it/workflows/CI/badge.svg?branch=master)
-[![Join the chat at https://gitter.im/Bash-it/bash-it](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Bash-it/bash-it?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+![Docs Status](https://readthedocs.org/projects/bash-it/badge/)
+[![Join the chat at https://webchat.freenode.net/?channel=#bash-it](https://img.shields.io/badge/chat-on%20freenode-brightgreen.svg)](https://webchat.freenode.net/?channel=#bash-it)
 
 **Bash-it** is a collection of community Bash commands and scripts for Bash 3.2+.
 (And a shameless ripoff of [oh-my-zsh](https://github.com/robbyrussell/oh-my-zsh) :smiley:)
@@ -11,8 +12,9 @@ Bash-it provides a solid framework for using, developing and maintaining shell s
 If you're using the _Bourne Again Shell_ (Bash) regularly and have been looking for an easy way on how to keep all of these nice little scripts and aliases under control, then Bash-it is for you!
 Stop polluting your `~/bin` directory and your `.bashrc` file, fork/clone Bash-it and start hacking away.
 
+- [Main Page](https://bash-it.readthedocs.io/en/latest)
 - [Contributing](#contributing)
-- [Installation](https://bash-it.readthedocs.io/en/latest/installation)
+- [Installation](#installation)
   - [Install Options](https://bash-it.readthedocs.io/en/latest/installation/#install-options)
   - [via Docker](https://bash-it.readthedocs.io/en/latest/installation/#install-using-docker)
   - [Updating](https://bash-it.readthedocs.io/en/latest/installation/#updating)
@@ -30,6 +32,17 @@ Stop polluting your `~/bin` directory and your `.bashrc` file, fork/clone Bash-i
 - [Misc](https://bash-it.readthedocs.io/en/latest/misc)
 - [Help Out](https://bash-it.readthedocs.io/en/latest/#help-out)
 - [Contributors](#contributors)
+
+## Installation
+
+1) Check out a clone of this repo to a location of your choice, such as
+   ``git clone --depth=1 https://github.com/Bash-it/bash-it.git ~/.bash_it``
+2) Run ``~/.bash_it/install.sh``
+
+Thats it! :smiley:  
+You can check out more components of Bash-it, and customize it to your desire.  
+For more information, see detailed instructions [here](https://bash-it.readthedocs.io/en/latest/installation/).
+
 
 ## Contributing
 
