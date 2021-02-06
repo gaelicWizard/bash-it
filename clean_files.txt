@@ -40,3 +40,4 @@ uninstall.sh
 # vendor init files
 #
 vendor/.gitattributes
+vendor/init.d
