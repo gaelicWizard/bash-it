@@ -3,7 +3,10 @@ cite 'about-alias'
 about-alias 'git aliases from oh-my-zsh (incompatible with regular git aliases option)'
 url "https://git-scm.com/"
 
-# We are not vendoring this, as we need to adapt it to bash :(
+if [[ -n $_bash_it_git_aliases_enabled ]]; then
+	_log_error "git-omz aliases are incompatible with regular git aliases"
+	return
+fi
 
 if _bash-it-component-item-is-enabled aliases git; then
 	_log_warning "git-omz aliases are incompatible with regular git aliases"
