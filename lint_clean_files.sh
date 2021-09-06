@@ -5,10 +5,9 @@
 #  - Empty lines are ignored
 #  - Comment lines (#) are ignored
 #
-# shellcheck disable=SC2002  # Prefer 'cat' for cleaner script
 FILES=()
 while IFS='' read -r line; do FILES+=("$line"); done < <(
-	cat clean_files.txt \
+	< clean_files.txt \
 		| grep -E -v '^\s*$' \
 		| grep -E -v '^\s*#' \
 		| xargs -I{} find "{}" -type f
