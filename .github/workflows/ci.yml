@@ -57,3 +57,12 @@ jobs:
       run: python3 -m pip install -r test/lint-requirements.txt
     - name: Run lint
       run: ./lint_clean_files.sh
+
+  rewrite:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: '0'
+    - name: Prohibit Merge from Pre-History
+      run: git lfs migrate info --skip-fetch --everything --pointers=ignore --include='*.[jptg][pnti][gf]' | fgrep -vq 'files'
