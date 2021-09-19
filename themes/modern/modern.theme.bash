@@ -28,7 +28,7 @@ function is_vim_shell() {
 }
 
 function detect_venv() {
-	local python_venv=""
+	python_venv=""
 	# Detect python venv
 	if [[ -n "${CONDA_DEFAULT_ENV:-}" ]]; then
 		python_venv="(${PYTHON_VENV_CHAR}${CONDA_DEFAULT_ENV}) "
