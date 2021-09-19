@@ -3,7 +3,7 @@
 
 # Detect whether a reboot is required
 function show_reboot_required() {
-	if [[ -n "${_bf_prompt_reboot_info}" ]]; then
+	if [[ -n "${_bf_prompt_reboot_info:-}" ]]; then
 		if [[ -f /var/run/reboot-required ]]; then
 			printf '%s' "Reboot required!"
 		fi
