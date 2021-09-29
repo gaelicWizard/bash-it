@@ -43,4 +43,4 @@ function _where_from_here_process()
 
 _where_from_aliases_to_index+=( "${BASH_SOURCE[@]}" )
 
-_bash_it_library_finalize_hook+=( '_where_from_here_process' )
+#_bash_it_library_finalize_hook+=( '_where_from_here_process' )
