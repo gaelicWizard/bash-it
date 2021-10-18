@@ -55,6 +55,7 @@ __bp_imported="${bash_preexec_imported}"
 __bp_last_ret_value="$?"
 BP_PIPESTATUS=("${PIPESTATUS[@]}")
 __bp_last_argument_prev_command="$_"
+__bp_ignorespace=
 
 __bp_inside_precmd=0
 __bp_inside_preexec=0
@@ -68,24 +69,33 @@ __bp_require_not_readonly() {
   local var
   for var; do
     if ! ( unset "$var" 2> /dev/null ); then
-      echo "bash-preexec requires write access to ${var}" >&2
+      echo "${BASH_SOURCE##*/} requires write access to ${var}" >&2
       return 1
     fi
   done
 }
 
-# Remove ignorespace and or replace ignoreboth from HISTCONTROL
-# so we can accurately invoke preexec with a command from our
-# history even if it starts with a space.
+# Remove ignorespace and or replace ignoreboth from HISTCONTROL so we can
+# accurately invoke preexec with a command from our history even if it starts
+# with a space.  We then remove commands that start with a space from the
+# history "manually", if either "ignorespace" or "ignoreboth" was part of
+# HISTCONTROL.
 __bp_adjust_histcontrol() {
     local histcontrol
-    histcontrol="${HISTCONTROL:-}"
+    if [[ "$HISTCONTROL" == *"ignorespace"* || "$HISTCONTROL" == *"ignoreboth"* ]]; then
+      __bp_ignorespace=yes
+    fi
+    histcontrol="${HISTCONTROL//ignorespace:}"
+    histcontrol="${histcontrol//:ignorespace}"
     histcontrol="${histcontrol//ignorespace}"
     # Replace ignoreboth with ignoredups
     if [[ "$histcontrol" == *"ignoreboth"* ]]; then
-        histcontrol="ignoredups:${histcontrol//ignoreboth}"
+        histcontrol="${histcontrol//ignoreboth:}"
+        histcontrol="${histcontrol//:ignoreboth}"
+        histcontrol="${histcontrol//ignoreboth}"
+        histcontrol="ignoredups${histcontrol:+:}${histcontrol}"
     fi;
-    export HISTCONTROL="$histcontrol"
+    HISTCONTROL="$histcontrol"
 }
 
 # This variable describes whether we are currently in "interactive mode";
@@ -96,8 +106,8 @@ __bp_adjust_histcontrol() {
 __bp_preexec_interactive_mode=""
 
 # These arrays are used to add functions to be run before, or after, prompts.
-declare -a precmd_functions
-declare -a preexec_functions
+declare -a precmd_functions=("${precmd_functions[@]:-}")
+declare -a preexec_functions=("${preexec_functions[@]:-}")
 
 # Trims leading and trailing whitespace from $2 and writes it to the variable
 # name passed as $1
@@ -212,8 +222,7 @@ __bp_preexec_invoke_exec() {
         return
     fi
     if [[ -z "${__bp_preexec_interactive_mode:-}" ]]; then
-        # We're doing something related to displaying the prompt.  Let the
-        # prompt set the title instead of me.
+        # We're doing something related to displaying the prompt. 
         return
     else
         # If we're in a subshell, then the prompt won't be re-displayed to put
@@ -234,14 +243,24 @@ __bp_preexec_invoke_exec() {
     fi
 
     local this_command
-    this_command=$(
-        export LC_ALL=C
-        HISTTIMEFORMAT= builtin history 1 | sed '1 s/^ *[0-9][0-9]*[* ] //'
-    )
+    if [[ "$HISTCONTROL" == *"ignorespace"* || "$HISTCONTROL" == *"ignoreboth"* ]]
+    then
+        this_command="${BASH_COMMAND:-}"
+        local __bp_ignorespace=
+    else
+        this_command="$( HISTTIMEFORMAT= builtin history 1 | sed '1 s/^ *[0-9][0-9]*[* ] //' )"
+    fi
 
     # Sanity check to make sure we have something to invoke our function with.
     if [[ -z "$this_command" ]]; then
         return
+    fi
+
+    # If we have remove "ignorespace" or "ignoreboth" from HISTCONTROL during
+    # setup, we need to remove commands that start with a space from the
+    # history ourselves.
+    if [[ -n "${__bp_ignorespace:-}" && "$this_command" == " "* ]]; then
+      history -d "$(HISTTIMEFORMAT= builtin history 1 | sed -r '1 s/^ *([0-9][0-9]*)[* ] .*$/\1/')"
     fi
 
     # Invoke every function defined in our function array.
@@ -251,7 +270,6 @@ __bp_preexec_invoke_exec() {
     for preexec_function in "${preexec_functions[@]:-}"; do
 
         # Only execute each function if it actually exists.
-        # Test existence of function with: declare -[fF]
         if type -t "$preexec_function" 1>/dev/null; then
             __bp_set_ret_value ${__bp_last_ret_value:-}
             # Quote our function invocation to prevent issues with IFS
