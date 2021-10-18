@@ -9,20 +9,29 @@ fi
 __bi_log_imported="loaded"
 
 source ~/Projects/logr/logr.bash
-logr start -v "Bash It"
+logr start -vv "Bash It"
 ((__logr_scope_depth--)) # minus one to account for `lib/log.bash`.
 #logr verbose
 
-declare -a __bash_it_log_prefix=("log" "${__bash_it_log_prefix[@]:-core}")
+declare -a __bash_it_log_prefix=("log")
+
+if [[ "$-" == *'i'* ]] && shopt -q expand_aliases; then
+	__bash_it_RESTORE_EXPAND_ALIASES=false
+else
+	__bash_it_RESTORE_EXPAND_ALIASES=true
+	shopt -s expand_aliases
+fi
 
 function _bash_it_log_prefix_pop() {
-	_log_trace "End${1:+ (}${1:-}${1:+)}"
-	unset -v '__bash_it_log_prefix[0]'
-	__bash_it_log_prefix=("${__bash_it_log_prefix[@]:-default}")
+	local IFS=$'\t\n' # Avoid word splitting.
+	_log_trace "End${1:+ (}${1:-}${1:+)}: ${__bash_it_log_prefix[@]:-}"
+	__bash_it_log_prefix=(${__bash_it_log_prefix[@]:1})
 }
 
 function _bash_it_log_prefix_push() {
-	local component_path="${_bash_it_log_section:-${1:-default}}"
+	local IFS=$'\t\n' # Avoid word splitting.
+	local component_path="${1:-default}"
+	local prefix="${_bash_it_log_section:-${component_path}}"
 	unset _bash_it_log_section
 	local without_extension component_directory
 	local component_filename component_type component_name
@@ -51,17 +60,17 @@ function _bash_it_log_prefix_push() {
 	fi
 
 	if [[ -r "$component_path" ]]; then
-		__bash_it_log_prefix=("${component_type:-default}: $component_name" "${__bash_it_log_prefix[@]}")
+		__bash_it_log_prefix=("${component_type:-default}: $component_name" ${__bash_it_log_prefix[@]:-})
 	elif [[ -n "$component_path" ]]; then
-		__bash_it_log_prefix=("${component_name}" "${__bash_it_log_prefix[@]}")
+		__bash_it_log_prefix=("${component_name}" ${__bash_it_log_prefix[@]:-})
 	fi
 	_log_trace "Begin" "${component_name}"
 }
 
-alias _log_trace=': logr "DEBUG"'
-alias _log_debug='logr "INFO"'
-alias _log_warn='logr "WARN"'
-alias _log_error='logr "ERROR"'
+alias _log_trace=': logr "DEBUG" -t "${__bash_it_log_prefix:-}"'
+alias _log_debug='logr "INFO" -t "${__bash_it_log_prefix:-}"'
+alias _log_warn='logr "WARN" -t "${__bash_it_log_prefix:-}"'
+alias _log_error='logr "ERROR" -t "${__bash_it_log_prefix:-}"'
 
 function _has_colors() {
 	# Check that stdout is a terminal, and that it has at least 8 colors.
@@ -73,7 +82,7 @@ alias _log_clean_aliases_and_trap="trap - RETURN; unalias source . _log_clean_al
 
 _bash_it_library_finalize_hook+=('trap - RETURN' 'unalias source . _log_clean_aliases_and_trap')
 
-alias source=': logr "TRACE" "Loading..." && builtin source'
+alias source='_bash_it_log_prefix_push && builtin source'
 alias .=source
 
-trap ': logr "TRACE" "Loaded."' RETURN
+trap '_bash_it_log_prefix_pop' RETURN
