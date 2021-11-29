@@ -7,6 +7,7 @@ then
 
   "
 
+  #TODO: add custom themes dir?
   THEMES="$BASH_IT/themes/*/*.theme.bash"
   for theme in $THEMES
   do

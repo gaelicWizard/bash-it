@@ -98,18 +98,18 @@ fi
 BASH_IT_LOG_PREFIX="core: main: "
 _log_debug "Loading custom aliases, completion, plugins..."
 for file_type in "aliases" "completion" "plugins"; do
-	if [ -e "${BASH_IT}/${file_type}/custom.${file_type}.bash" ]; then
+	if [ -e "${BASH_IT_CONFIG}/${file_type}/custom.${file_type}.bash" ]; then
 		BASH_IT_LOG_PREFIX="${file_type}: custom: "
 		_log_debug "Loading component..."
 		# shellcheck disable=SC1090
-		source "${BASH_IT}/${file_type}/custom.${file_type}.bash"
+		source "${BASH_IT_CONFIG}/${file_type}/custom.${file_type}.bash"
 	fi
 done
 
 # Custom
 BASH_IT_LOG_PREFIX="core: main: "
 _log_debug "Loading general custom files..."
-CUSTOM="${BASH_IT_CUSTOM:=${BASH_IT}/custom}/*.bash ${BASH_IT_CUSTOM:=${BASH_IT}/custom}/**/*.bash"
+CUSTOM="${BASH_IT_CONFIG}/custom}/*.bash ${BASH_IT_CONFIG}/custom}/**/*.bash"
 for _bash_it_config_file in $CUSTOM; do
 	if [ -e "${_bash_it_config_file}" ]; then
 		filename=$(basename "${_bash_it_config_file}")

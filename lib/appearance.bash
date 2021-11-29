@@ -4,7 +4,7 @@
 export LSCOLORS='Gxfxcxdxdxegedabagacad'
 
 if [[ -z "$CUSTOM_THEME_DIR" ]]; then
-    CUSTOM_THEME_DIR="${BASH_IT_CUSTOM:=${BASH_IT}/custom}/themes"
+    CUSTOM_THEME_DIR="${BASH_IT_CONFIG}/custom/themes"
 fi
 
 # Load the theme

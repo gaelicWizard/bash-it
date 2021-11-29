@@ -8,6 +8,8 @@ esac
 
 # Path to the bash it configuration
 export BASH_IT="{{BASH_IT}}"
+# Path to the user configuration
+export BASH_IT_CONFIG="${BASH_IT_CONFIG:={{BASH_IT_CONFIG}}}"
 
 # Lock and Load a custom theme file.
 # Leave empty to disable theming.

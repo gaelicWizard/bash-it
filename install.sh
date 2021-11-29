@@ -19,11 +19,11 @@ function _bash-it_show_usage() {
 function _bash-it_load_one() {
 	file_type=$1
 	file_to_enable=$2
-	mkdir -p "$BASH_IT/${file_type}/enabled"
+	mkdir -p "$BASH_IT_CONFIG/${file_type}/enabled"
 
-	dest="${BASH_IT}/${file_type}/enabled/${file_to_enable}"
+	dest="${BASH_IT_CONFIG}/${file_type}/enabled/${file_to_enable}"
 	if [ ! -e "${dest}" ]; then
-		ln -sf "../available/${file_to_enable}" "${dest}"
+		ln -sf "${BASH_IT}/available/${file_to_enable}" "${dest}"
 	else
 		echo "File ${dest} exists, skipping"
 	fi
@@ -34,7 +34,7 @@ function _bash-it_load_some() {
 	file_type=$1
 	single_type=$(echo "$file_type" | sed -e "s/aliases$/alias/g" | sed -e "s/plugins$/plugin/g")
 	enable_func="_enable-$single_type"
-	[ -d "$BASH_IT/$file_type/enabled" ] || mkdir "$BASH_IT/$file_type/enabled"
+	[ -d "$BASH_IT_CONFIG/$file_type/enabled" ] || mkdir "$BASH_IT_CONFIG/$file_type/enabled"
 	for path in "$BASH_IT/${file_type}/available/"[^_]*; do
 		file_name=$(basename "$path")
 		while true; do
@@ -66,7 +66,7 @@ function _bash-it_backup() {
 # Back up existing profile and create new one for bash-it
 function _bash-it_backup_new() {
 	_bash-it_backup
-	sed "s|{{BASH_IT}}|$BASH_IT|" "$BASH_IT/template/bash_profile.template.bash" > "$HOME/$CONFIG_FILE"
+	sed -e "s|{{BASH_IT}}|$BASH_IT|" -e "s|{{BASH_IT_CONFIG}}|$BASH_IT_CONFIG_TEMPLATE|" "$BASH_IT/template/bash_profile.template.bash" > "$HOME/$CONFIG_FILE"
 	echo -e "\033[0;32mCopied the template $CONFIG_FILE into ~/$CONFIG_FILE, edit this file to customize bash-it\033[0m"
 }
 
@@ -109,6 +109,62 @@ function _bash-it_check_for_backup() {
 	else
 		echo -e "\033[0;32mOverwriting backup...\033[m"
 	fi
+}
+
+function _bash-it_choose_bash_it_config_dir() {
+    if [[ -z "${silent}" ]]; then
+        echo Please select where to store your bash-it configuration
+        select config_dir in '${XDG_CONFIG_HOME:-${HOME}/.config}/bash-it' "${BASH_IT}" "Write one" "Quit"; do
+            case "$config_dir" in
+                '${XDG_CONFIG_HOME:-${HOME}/.config}/bash-it')
+                    read -e -n 1 -r -p "Right now this results in '${XDG_CONFIG_HOME:-${HOME}/.config}/bash-it' does that look ok? [y/N] " choice
+                    case $choice in
+                        [yY])
+                            export BASH_IT_CONFIG_TEMPLATE='${XDG_CONFIG_HOME:-${HOME}/.config}/bash-it'
+                            export BASH_IT_CONFIG=${XDG_CONFIG_HOME:-${HOME}/.config}/bash-it
+                            break 3
+                            ;;
+                        [nN] | "")
+                            continue
+                            ;;
+                        *)
+                            echo -e "\033[91mPlease choose y or n.\033[m"
+                            ;;
+                    esac
+
+                    ;;
+                "${BASH_IT}")
+                    export BASH_IT_CONFIG_TEMPLATE='${BASH_IT}'
+                    export BASH_IT_CONFIG="${BASH_IT}"
+                    break 2
+                    ;;
+                "Write one")
+                    while read -e -r -i "${BASH_IT_CONFIG}" -p "Enter BASH_IT_CONFIG dir> " folder; do
+                        [ -z "$folder" ] && break
+                        [ -d "$folder" ] || mkdir -p $folder || continue
+                        if [ \! -w "$folder" ]; then
+                            echo "${folder} not writable";
+                            continue
+                        fi
+                        export BASH_IT_CONFIG_TEMPLATE="${folder}"
+                        export BASH_IT_CONFIG="${folder}"
+                        break 2
+                    done
+                    ;;
+                "Quit")
+                    echo -e "\033[91mInstallation aborted. Please come back soon!\033[m"
+                    exit 0
+                    ;;
+                *)
+                    echo "Try again"
+                    continue
+                    ;;
+            esac
+        done
+    else
+        export BASH_IT_CONFIG_TEMPLATE='${XDG_CONFIG_HOME:-${HOME}/.config}/bash-it'
+        export BASH_IT_CONFIG=${XDG_CONFIG_HOME:-${HOME}/.config}/bash-it
+    fi
 }
 
 function _bash-it_modify_config_files() {
@@ -185,6 +241,7 @@ if [[ -n "${no_modify_config}" && -n "${append_to_config}" ]]; then
 fi
 
 BASH_IT="$(cd "${BASH_SOURCE%/*}" && pwd)"
+_bash-it_choose_bash_it_config_dir
 
 case $OSTYPE in
 	darwin*)

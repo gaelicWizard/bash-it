@@ -350,7 +350,7 @@ _bash-it-migrate() {
 
   for file_type in "aliases" "plugins" "completion"
   do
-    for f in `sort <(compgen -G "${BASH_IT}/$file_type/enabled/*.bash")`
+    for f in `sort <(compgen -G "${BASH_IT_CONFIG}/$file_type/enabled/*.bash")`
     do
       typeset ff="${f##*/}"
 
@@ -514,7 +514,7 @@ _bash-it-describe ()
         # Check for both the old format without the load priority, and the extended format with the priority
         declare enabled_files enabled_file
 		enabled_file="${f##*/}"
-        enabled_files=$(sort <(compgen -G "${BASH_IT}/enabled/*$BASH_IT_LOAD_PRIORITY_SEPARATOR${enabled_file}") <(compgen -G "${BASH_IT}/$subdirectory/enabled/${enabled_file}") <(compgen -G "${BASH_IT}/$subdirectory/enabled/*$BASH_IT_LOAD_PRIORITY_SEPARATOR${enabled_file}") | wc -l)
+        enabled_files=$(sort <(compgen -G "${BASH_IT_CONFIG}/enabled/*$BASH_IT_LOAD_PRIORITY_SEPARATOR${enabled_file}") <(compgen -G "${BASH_IT_CONFIG}/$subdirectory/enabled/${enabled_file}") <(compgen -G "${BASH_IT_CONFIG}/$subdirectory/enabled/*$BASH_IT_LOAD_PRIORITY_SEPARATOR${enabled_file}") | wc -l)
 
         if [ $enabled_files -gt 0 ]; then
             enabled='x'
@@ -593,31 +593,31 @@ _disable-thing ()
 
     if [ "$file_entity" = "all" ]; then
         # Disable everything that's using the old structure
-        for f in `compgen -G "${BASH_IT}/$subdirectory/enabled/*.${suffix}.bash"`
+        for f in `compgen -G "${BASH_IT_CONFIG}/$subdirectory/enabled/*.${suffix}.bash"`
         do
           rm "$f"
         done
 
         # Disable everything in the global "enabled" directory
-        for f in `compgen -G "${BASH_IT}/enabled/*.${suffix}.bash"`
+        for f in `compgen -G "${BASH_IT_CONFIG}/enabled/*.${suffix}.bash"`
         do
           rm "$f"
         done
     else
-        typeset plugin_global=$(command ls $ "${BASH_IT}/enabled/"[0-9]*$BASH_IT_LOAD_PRIORITY_SEPARATOR$file_entity.$suffix.bash 2>/dev/null | head -1)
+        typeset plugin_global=$(command ls $ "${BASH_IT_CONFIG}/enabled/"[0-9]*$BASH_IT_LOAD_PRIORITY_SEPARATOR$file_entity.$suffix.bash 2>/dev/null | head -1)
         if [ -z "$plugin_global" ]; then
           # Use a glob to search for both possible patterns
           # 250---node.plugin.bash
           # node.plugin.bash
           # Either one will be matched by this glob
-          typeset plugin=$(command ls $ "${BASH_IT}/$subdirectory/enabled/"{[0-9]*$BASH_IT_LOAD_PRIORITY_SEPARATOR$file_entity.$suffix.bash,$file_entity.$suffix.bash} 2>/dev/null | head -1)
+          typeset plugin=$(command ls $ "${BASH_IT_CONFIG}/$subdirectory/enabled/"{[0-9]*$BASH_IT_LOAD_PRIORITY_SEPARATOR$file_entity.$suffix.bash,$file_entity.$suffix.bash} 2>/dev/null | head -1)
           if [ -z "$plugin" ]; then
               printf '%s\n' "sorry, $file_entity does not appear to be an enabled $file_type."
               return
           fi
-          rm "${BASH_IT}/$subdirectory/enabled/${plugin##*/}"
+          rm "${BASH_IT_CONFIG}/$subdirectory/enabled/${plugin##*/}"
         else
-          rm "${BASH_IT}/enabled/${plugin_global##*/}"
+          rm "${BASH_IT_CONFIG}/enabled/${plugin_global##*/}"
         fi
     fi
 
@@ -695,26 +695,26 @@ _enable-thing ()
 
 		to_enable="${to_enable##*/}"
         # Check for existence of the file using a wildcard, since we don't know which priority might have been used when enabling it.
-        typeset enabled_plugin=$(command ls "${BASH_IT}/$subdirectory/enabled/"{[0-9][0-9][0-9]$BASH_IT_LOAD_PRIORITY_SEPARATOR$to_enable,$to_enable} 2>/dev/null | head -1)
+        typeset enabled_plugin=$(command ls "${BASH_IT_CONFIG}/$subdirectory/enabled/"{[0-9][0-9][0-9]$BASH_IT_LOAD_PRIORITY_SEPARATOR$to_enable,$to_enable} 2>/dev/null | head -1)
         if [ ! -z "$enabled_plugin" ] ; then
           printf '%s\n' "$file_entity is already enabled."
           return
         fi
 
-        typeset enabled_plugin_global=$(command compgen -G "${BASH_IT}/enabled/[0-9][0-9][0-9]$BASH_IT_LOAD_PRIORITY_SEPARATOR$to_enable" 2>/dev/null | head -1)
+        typeset enabled_plugin_global=$(command compgen -G "${BASH_IT_CONFIG}/enabled/[0-9][0-9][0-9]$BASH_IT_LOAD_PRIORITY_SEPARATOR$to_enable" 2>/dev/null | head -1)
         if [ ! -z "$enabled_plugin_global" ] ; then
           printf '%s\n' "$file_entity is already enabled."
           return
         fi
 
-        mkdir -p "${BASH_IT}/enabled"
+        mkdir -p "${BASH_IT_CONFIG}/enabled"
 
         # Load the priority from the file if it present there
         declare local_file_priority use_load_priority
 		local_file_priority="$(_bash-it-egrep "^# BASH_IT_LOAD_PRIORITY:" "${BASH_IT}/$subdirectory/available/$to_enable" | awk -F': ' '{ print $2 }')"
 		use_load_priority="${local_file_priority:-$load_priority}"
 
-        ln -s ../$subdirectory/available/$to_enable "${BASH_IT}/enabled/${use_load_priority}${BASH_IT_LOAD_PRIORITY_SEPARATOR}${to_enable}"
+        ln -s ${BASH_IT}/$subdirectory/available/$to_enable "${BASH_IT_CONFIG}/enabled/${use_load_priority}${BASH_IT_LOAD_PRIORITY_SEPARATOR}${to_enable}"
     fi
 
     _bash-it-clean-component-cache "${file_type}"
@@ -750,11 +750,12 @@ _help-aliases()
     else
         typeset f
 
-        for f in `sort <(compgen -G "${BASH_IT}/aliases/enabled/*") <(compgen -G "${BASH_IT}/enabled/*.aliases.bash")`
+        for f in `sort <(compgen -G "${BASH_IT_CONFIG}/aliases/enabled/*") <(compgen -G "${BASH_IT_CONFIG}/enabled/*.aliases.bash")`
         do
             _help-list-aliases $f
         done
 
+        #TODO: Shouldn't this be in ${BASH_IT_CONFIG/custom?
         if [ -e "${BASH_IT}/aliases/custom.aliases.bash" ]; then
           _help-list-aliases "${BASH_IT}/aliases/custom.aliases.bash"
         fi
