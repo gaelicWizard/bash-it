@@ -86,18 +86,20 @@ _KAC_get_and_regen_cache() {
 _KAC_clean_cache() {
 	local FILE CMD
 	# delete all obsolete temp files, could be lingering there for any kind of crash in the caching process
-	for FILE in "$_KAC_CACHE_TMP_DIR"/*; do
+	for FILE in "$_KAC_CACHE_TMP_DIR"/*
+	do
 		_KAC_is_file_newer_than "$FILE" "$_KNIFE_AUTOCOMPLETE_MAX_CACHE_AGE" || rm -f "$FILE"
 	done
 	# refresh really stale caches
 	find "$_KNIFE_AUTOCOMPLETE_CACHE_DIR" -maxdepth 1 -type f -not -name '.*' \
-		| while read -r FILE; do
-			_KAC_is_file_newer_than "$FILE" "$_KNIFE_AUTOCOMPLETE_MAX_CACHE_AGE" && continue
-			# first let's get the original command
-			CMD=$(_KAC_get_command_from_cache_name "$(basename "$FILE")")
-			# then regen the cache
-			_KAC_get_and_regen_cache "$CMD" > /dev/null
-		done
+		| while read -r FILE
+	do
+		_KAC_is_file_newer_than "$FILE" "$_KNIFE_AUTOCOMPLETE_MAX_CACHE_AGE" && continue
+		# first let's get the original command
+		CMD=$(_KAC_get_command_from_cache_name "${FILE##*/}")
+		# then regen the cache
+		_KAC_get_and_regen_cache "$CMD" > /dev/null
+	done
 }
 
 # perform a cache cleaning when loading this file

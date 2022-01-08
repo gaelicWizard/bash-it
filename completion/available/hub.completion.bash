@@ -235,7 +235,7 @@ if _is_function _git && ! _is_function __git_list_all_commands_without_hub; then
 			((c++))
 		done
 		if [[ -z "$name" ]]; then
-			repo="$(basename "${PWD}")"
+			repo="${PWD##*/}"
 		fi
 		case "$prev" in
 			-d | -h)
