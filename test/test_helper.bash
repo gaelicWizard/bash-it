@@ -38,6 +38,7 @@ function common_setup_file() {
 	git config --global init.defaultBranch "master"
 
 	# Locate the temporary folder, avoid double-slash.
+	: "${BATS_FILE_TMPDIR?}"
 	BASH_IT="${BATS_FILE_TMPDIR//\/\///}/.bash_it"
 
 	# This sets up a local test fixture, i.e. a completely fresh and isolated Bash-it directory. This is done to avoid messing with your own Bash-it source directory.
