@@ -3,14 +3,7 @@
 load ../test_helper
 
 # Determine which config file to use based on OS.
-case $OSTYPE in
-  darwin*)
-    export BASH_IT_CONFIG_FILE=.bash_profile
-    ;;
-  *)
-    export BASH_IT_CONFIG_FILE=.bashrc
-    ;;
-esac
+export BASH_IT_CONFIG_FILE=.bashrc
 
 function local_setup {
   setup_test_fixture
@@ -78,7 +71,7 @@ function local_setup {
   assert_file_exist "$BASH_IT_TEST_HOME/$BASH_IT_CONFIG_FILE"
   assert_file_exist "$BASH_IT_TEST_HOME/$BASH_IT_CONFIG_FILE.bak"
 
-  run cat $BASH_IT_TEST_HOME/$BASH_IT_CONFIG_FILE
+  run cat "$BASH_IT_TEST_HOME/$BASH_IT_CONFIG_FILE"
 
   assert_line "test file content"
   assert_line "source \"\$BASH_IT\"/bash_it.sh"
