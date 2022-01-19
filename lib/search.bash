@@ -70,7 +70,7 @@ function _bash-it-search() {
 				return 0
 				;;
 			'-r' | '--refresh')
-				_bash-it-clean-component-cache
+				_bash-it-component-clean-cache
 				;;
 			'-c' | '--no-color')
 				BASH_IT_SEARCH_USE_COLOR=false
@@ -204,7 +204,7 @@ function _bash-it-search-component() {
 			component_singular="${component_singular/ns/n}" # plugins -> plugin
 
 			action="${search_command}"
-			action_func="_${action}-${component_singular}"
+			action_func="_bash-it-${action}-${component_singular}"
 			break
 		fi
 	done
@@ -336,7 +336,7 @@ function _bash-it-search-result() {
 			printf '%b' "${color_off} "
 		done
 
-		((modified)) && _bash-it-clean-component-cache "${component}"
+		((modified)) && _bash-it-component-clean-cache "${component}"
 		printf "\n"
 	fi
 }

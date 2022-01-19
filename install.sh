@@ -33,7 +33,7 @@ function _bash-it_load_one() {
 function _bash-it_load_some() {
 	file_type=$1
 	single_type=$(echo "$file_type" | sed -e "s/aliases$/alias/g" | sed -e "s/plugins$/plugin/g")
-	enable_func="_enable-$single_type"
+	enable_func="_bash-it-enable-$single_type"
 	[ -d "$BASH_IT/$file_type/enabled" ] || mkdir "$BASH_IT/$file_type/enabled"
 	for path in "$BASH_IT/${file_type}/available/"[^_]*; do
 		file_name=$(basename "$path")

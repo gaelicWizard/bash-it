@@ -114,64 +114,33 @@ function bash-it() {
 	example '$ bash-it profile list|save|load|rm [profile_name]'
 	example '$ bash-it doctor errors|warnings|all'
 	local verb=${1:-}
-	shift
+	shift 2> /dev/null || true # ignore missing argument at this stage (when `shift_verbose` is on).
 	local component=${1:-}
-	shift
-	local func
+	shift 2> /dev/null || true # ignore missing argument at this stage (when `shift_verbose` is on).
+	local func fargs=("${@}") arg
 
 	case "$verb" in
 		show)
-			func="_bash-it-$component"
-			;;
-		enable)
-			func="_enable-$component"
-			;;
-		disable)
-			func="_disable-$component"
-			;;
-		help)
-			func="_help-$component"
-			;;
-		doctor)
-			func="_bash-it-doctor-$component"
-			;;
-		profile)
-			func=_bash-it-profile-$component
-			;;
-		search)
-			_bash-it-search "$component" "$@"
-			return
-			;;
-		update)
-			func="_bash-it-update-$component"
-			;;
-		migrate)
-			func="_bash-it-migrate"
-			;;
-		version)
-			func="_bash-it-version"
-			;;
-		restart)
-			func="_bash-it-restart"
-			;;
-		reload)
-			func="_bash-it-reload"
-			;;
-		*)
-			reference "bash-it"
-			return
+			verb="describe"
 			;;
 	esac
 
-	# pluralize component if necessary
+	func="_bash-it-${verb}${component+-}${component}"
+
 	if ! _is_function "$func"; then
+		# pluralize component if necessary
 		if _is_function "${func}s"; then
 			func="${func}s"
+		elif _is_function "${func}es"; then
+			func="${func}es"
 		else
-			if _is_function "${func}es"; then
-				func="${func}es"
+			if _is_function "_bash-it-${verb}"; then
+				func="_bash-it-${verb}"
+				fargs=("${component}" "${@}")
 			else
-				echo "oops! $component is not a valid option!"
+				if [[ -n "${component:-${verb:-}}" ]]; then
+					echo "oops! ${component:-${verb}} is not a valid option!"
+				fi
 				reference bash-it
 				return
 			fi
@@ -182,7 +151,7 @@ function bash-it() {
 		# Automatically run a migration if required
 		_bash-it-migrate
 
-		for arg in "$@"; do
+		for arg in "${fargs[@]}"; do
 			"$func" "$arg"
 		done
 
@@ -190,7 +159,7 @@ function bash-it() {
 			_bash-it-reload
 		fi
 	else
-		"$func" "$@"
+		"$func" "${fargs[@]}"
 	fi
 }
 
@@ -202,7 +171,7 @@ function _is_function() {
 	_example '$ _is_function ls && echo exists'
 	_group 'lib'
 	local msg="${2:-Function '$1' does not exist}"
-	if LC_ALL=C type -t "$1" | _bash-it-egrep -q 'function'; then
+	if LC_ALL=C type -t "$1" | _bash-it-egrep -q -- 'function'; then
 		return 0
 	else
 		_log_debug "$msg"
@@ -210,21 +179,21 @@ function _is_function() {
 	fi
 }
 
-function _bash-it-aliases() {
+function _bash-it-describe-aliases() {
 	_about 'summarizes available bash_it aliases'
 	_group 'lib'
 
 	_bash-it-describe "aliases" "an" "alias" "Alias"
 }
 
-function _bash-it-completions() {
+function _bash-it-describe-completions() {
 	_about 'summarizes available bash_it completions'
 	_group 'lib'
 
 	_bash-it-describe "completion" "a" "completion" "Completion"
 }
 
-function _bash-it-plugins() {
+function _bash-it-describe-plugins() {
 	_about 'summarizes available bash_it plugins'
 	_group 'lib'
 
@@ -235,14 +204,14 @@ function _bash-it-update-dev() {
 	_about 'updates Bash-it to the latest master'
 	_group 'lib'
 
-	_bash-it-update- dev "$@"
+	_bash-it-update dev "$@"
 }
 
 function _bash-it-update-stable() {
 	_about 'updates Bash-it to the latest tag'
 	_group 'lib'
 
-	_bash-it-update- stable "$@"
+	_bash-it-update stable "$@"
 }
 
 function _bash-it_update_migrate_and_restart() {
@@ -264,7 +233,7 @@ function _bash-it_update_migrate_and_restart() {
 	fi
 }
 
-function _bash-it-update-() {
+function _bash-it-update() {
 	_about 'updates Bash-it'
 	_param '1: What kind of update to do (stable|dev)'
 	_group 'lib'
@@ -384,8 +353,8 @@ function _bash-it-migrate() {
 			single_type="${component_type/aliases/aliass}"
 			echo "Migrating ${single_type%s} $component_name."
 
-			disable_func="_disable-${single_type%s}"
-			enable_func="_enable-${single_type%s}"
+			disable_func="_bash-it-disable-${single_type%s}"
+			enable_func="_bash-it-enable-${single_type%s}"
 
 			"$disable_func" "$component_name"
 			"$enable_func" "$component_name"
@@ -473,7 +442,7 @@ function _bash-it-doctor-errors() {
 	_bash-it-doctor "${BASH_IT_LOG_LEVEL_ERROR?}"
 }
 
-function _bash-it-doctor-() {
+function _bash-it-doctor() {
 	_about 'default bash-it doctor behavior, behaves like bash-it doctor all'
 	_group 'lib'
 
@@ -678,10 +647,12 @@ function _bash-it-describe() {
 	_example '$ _bash-it-describe "plugins" "a" "plugin" "Plugin"'
 
 	local subdirectory preposition file_type column_header f enabled enabled_file
-	subdirectory="$1"
-	preposition="$2"
-	file_type="$3"
-	column_header="$4"
+
+	subdirectory="$1"     # =pluralize, but singular completion
+	preposition="${2:-a}" # "a" unless vowel or...h...?
+	[[ ${subdirectory:0:1} == [AaEeIiOoUu] ]] && preposition="an"
+	file_type="${3:-${subdirectory//plugins/plugin}}"                      # singularize, except aliases
+	column_header="${4:-$(_bash-it-component-singularize "${file_type}")}" # Capitalize first letter
 
 	printf "%-20s %-10s %s\n" "$column_header" 'Enabled?' 'Description'
 	for f in "${BASH_IT?}/$subdirectory/available"/*.*.bash; do
@@ -689,7 +660,7 @@ function _bash-it-describe() {
 		enabled_file="${f##*/}"
 		enabled_file="${enabled_file%."${file_type}"*.bash}"
 		_bash-it-component-item-is-enabled "${file_type}" "${enabled_file}" && enabled='x'
-		printf "%-20s %-10s %s\n" "$enabled_file" "[${enabled:- }]" "$(metafor "about-$file_type" < "$f")"
+		printf "%-20s %-10s %s\n" "${enabled_file}" "[${enabled:- }]" "$(metafor "about-$file_type" < "$f")"
 	done
 	printf '\n%s\n' "to enable $preposition $file_type, do:"
 	printf '%s\n' "$ bash-it enable $file_type  <$file_type name> [$file_type name]... -or- $ bash-it enable $file_type all"
@@ -697,10 +668,10 @@ function _bash-it-describe() {
 	printf '%s\n' "$ bash-it disable $file_type <$file_type name> [$file_type name]... -or- $ bash-it disable $file_type all"
 }
 
-function _on-disable-callback() {
+function _bash-it-component-disable-callback() {
 	_about 'Calls the disabled plugin destructor, if present'
 	_param '1: plugin name'
-	_example '$ _on-disable-callback gitstatus'
+	_example '$ _bash-it-component-disable-callback gitstatus'
 	_group 'lib'
 
 	local callback="${1}_on_disable"
@@ -717,40 +688,40 @@ function _disable-all() {
 	_disable-completion "all"
 }
 
-function _disable-plugin() {
+function _bash-it-disable-plugin() {
 	_about 'disables bash_it plugin'
 	_param '1: plugin name'
 	_example '$ disable-plugin rvm'
 	_group 'lib'
 
-	_disable-thing "plugins" "plugin" "$1"
-	_on-disable-callback "$1"
+	_bash-it-component-disable "plugins" "plugin" "$1"
+	_bash-it-component-disable-callback "$1"
 }
 
-function _disable-alias() {
+function _bash-it-disable-alias() {
 	_about 'disables bash_it alias'
 	_param '1: alias name'
 	_example '$ disable-alias git'
 	_group 'lib'
 
-	_disable-thing "aliases" "alias" "$1"
+	_bash-it-component-disable "aliases" "alias" "$1"
 }
 
-function _disable-completion() {
+function _bash-it-disable-completion() {
 	_about 'disables bash_it completion'
 	_param '1: completion name'
 	_example '$ disable-completion git'
 	_group 'lib'
 
-	_disable-thing "completion" "completion" "$1"
+	_bash-it-component-disable "completion" "completion" "$1"
 }
 
-function _disable-thing() {
+function _bash-it-component-disable() {
 	_about 'disables a bash_it component'
 	_param '1: subdirectory'
 	_param '2: file_type'
 	_param '3: file_entity'
-	_example '$ _disable-thing "plugins" "plugin" "ssh"'
+	_example '$ _bash-it-component-disable "plugins" "plugin" "ssh"'
 
 	local subdirectory="${1?}"
 	local file_type="${2?}"
@@ -761,7 +732,7 @@ function _disable-thing() {
 		return
 	fi
 
-	local f suffix _bash_it_config_file plugin
+	local f suffix _bash_it_config_file plugins plugin
 	suffix="${subdirectory/plugins/plugin}"
 
 	if [[ "$file_entity" == "all" ]]; then
@@ -787,7 +758,7 @@ function _disable-thing() {
 		fi
 	fi
 
-	_bash-it-clean-component-cache "${file_type}"
+	_bash-it-component-clean-cache "${file_type}"
 
 	if [[ "$file_entity" = "all" ]]; then
 		printf '%s\n' "$file_entity $(_bash-it-pluralize-component "$file_type") disabled."
@@ -796,13 +767,13 @@ function _disable-thing() {
 	fi
 }
 
-function _enable-plugin() {
+function _bash-it-enable-plugin() {
 	_about 'enables bash_it plugin'
 	_param '1: plugin name'
 	_example '$ enable-plugin rvm'
 	_group 'lib'
 
-	_enable-thing "plugins" "plugin" "$1" "$BASH_IT_LOAD_PRIORITY_PLUGIN"
+	_bash-it-component-enable "plugins" "plugin" "$1" "$BASH_IT_LOAD_PRIORITY_PLUGIN"
 }
 
 function _enable-plugins() {
@@ -810,13 +781,13 @@ function _enable-plugins() {
 	_enable-plugin "$@"
 }
 
-function _enable-alias() {
+function _bash-it-enable-alias() {
 	_about 'enables bash_it alias'
 	_param '1: alias name'
 	_example '$ enable-alias git'
 	_group 'lib'
 
-	_enable-thing "aliases" "alias" "$1" "$BASH_IT_LOAD_PRIORITY_ALIAS"
+	_bash-it-component-enable "aliases" "alias" "$1" "$BASH_IT_LOAD_PRIORITY_ALIAS"
 }
 
 function _enable-aliases() {
@@ -824,23 +795,23 @@ function _enable-aliases() {
 	_enable-alias "$@"
 }
 
-function _enable-completion() {
+function _bash-it-enable-completion() {
 	_about 'enables bash_it completion'
 	_param '1: completion name'
 	_example '$ enable-completion git'
 	_group 'lib'
 
-	_enable-thing "completion" "completion" "$1" "$BASH_IT_LOAD_PRIORITY_COMPLETION"
+	_bash-it-component-enable "completion" "completion" "$1" "$BASH_IT_LOAD_PRIORITY_COMPLETION"
 }
 
-function _enable-thing() {
+function _bash-it-component-enable() {
 	cite _about _param _example
 	_about 'enables a bash_it component'
 	_param '1: subdirectory'
 	_param '2: file_type'
 	_param '3: file_entity'
 	_param '4: load priority'
-	_example '$ _enable-thing "plugins" "plugin" "ssh" "150"'
+	_example '$ _bash-it-component-enable "plugins" "plugin" "ssh" "150"'
 
 	local subdirectory="${1?}"
 	local file_type="${2?}"
@@ -852,13 +823,13 @@ function _enable-thing() {
 		return
 	fi
 
-	local _bash_it_config_file to_enable to_enables enabled_plugin local_file_priority use_load_priority
+	local _bash_it_config_file to_enable to_enables enabled_plugin enabled_plugins local_file_priority use_load_priority
 	local suffix="${subdirectory/plugins/plugin}"
 
 	if [[ "$file_entity" == "all" ]]; then
 		for _bash_it_config_file in "${BASH_IT}/$subdirectory/available"/*.bash; do
 			to_enable="${_bash_it_config_file##*/}"
-			_enable-thing "$subdirectory" "$file_type" "${to_enable%."${file_type/alias/aliases}".bash}" "$load_priority"
+			"${FUNCNAME[0]?}" "$subdirectory" "$file_type" "${to_enable%."${file_type/alias/aliases}".bash}" "$load_priority"
 		done
 	else
 		to_enables=("${BASH_IT}/$subdirectory/available/$file_entity.${suffix}.bash")
@@ -885,19 +856,19 @@ function _enable-thing() {
 		ln -s "../$subdirectory/available/$to_enable" "${BASH_IT}/enabled/${use_load_priority}${BASH_IT_LOAD_PRIORITY_SEPARATOR}${to_enable}"
 	fi
 
-	_bash-it-clean-component-cache "${file_type}"
+	_bash-it-component-clean-cache "${file_type}"
 
 	printf '%s\n' "$file_entity enabled with priority $use_load_priority."
 }
 
-function _help-completions() {
+function _bash-it-help-completions() {
 	_about 'summarize all completions available in bash-it'
 	_group 'lib'
 
 	_bash-it-completions
 }
 
-function _help-aliases() {
+function _bash-it-help-aliases() {
 	_about 'shows help for all aliases, or a specific alias group'
 	_param '1: optional alias group'
 	_example '$ alias-help'
@@ -918,16 +889,16 @@ function _help-aliases() {
 
 		for f in "${BASH_IT}/aliases/enabled"/* "${BASH_IT}/enabled"/*."aliases.bash"; do
 			[[ -f "$f" ]] || continue
-			_help-list-aliases "$f"
+			_bash-it-help-aliases-list "$f"
 		done
 
 		if [[ -e "${BASH_IT}/aliases/custom.aliases.bash" ]]; then
-			_help-list-aliases "${BASH_IT}/aliases/custom.aliases.bash"
+			_bash-it-help-aliases-list "${BASH_IT}/aliases/custom.aliases.bash"
 		fi
 	fi
 }
 
-function _help-list-aliases() {
+function _bash-it-help-aliases-list() {
 	local file
 	file="$(_bash-it-get-component-name-from-path "${1?}")"
 	printf '\n\n%s:\n' "${file}"
@@ -935,7 +906,7 @@ function _help-list-aliases() {
 	metafor alias < "$1" | sed "s/$/'/"
 }
 
-function _help-plugins() {
+function _bash-it-help-plugins() {
 	_about 'summarize all functions defined by enabled bash-it plugins'
 	_group 'lib'
 
@@ -964,7 +935,7 @@ function _help-plugins() {
 	rm "$grouplist" 2> /dev/null
 }
 
-function _help-profile() {
+function _bash-it-help-profile() {
 	_about 'help message for profile command'
 	_group 'lib'
 
@@ -982,7 +953,7 @@ function _help-update() {
 	echo "Check for a new version of Bash-it and update it."
 }
 
-function _help-migrate() {
+function _bash-it-help-migrate() {
 	_about 'help message for migrate command'
 	_group 'lib'
 
