@@ -9,24 +9,17 @@ fi
 __bi_log_imported="loaded"
 
 source ~/Projects/logr/logr.bash
-logr start -vv "Bash It"
+BASH_IT_LOG_LEVEL_V="-vvv"
+logr start ${BASH_IT_LOG_LEVEL_V:-} "Bash It"
 ((__logr_scope_depth--)) # minus one to account for `lib/log.bash`.
 #logr verbose
 
 declare -a __bash_it_log_prefix=("log")
 
-if [[ "$-" == *'i'* ]] && shopt -q expand_aliases; then
-	__bash_it_RESTORE_EXPAND_ALIASES=false
-else
-	__bash_it_RESTORE_EXPAND_ALIASES=true
-	shopt -s expand_aliases
-fi
-
-function _bash_it_log_prefix_pop() {
-	local IFS=$'\t\n' # Avoid word splitting.
-	_log_trace "End${1:+ (}${1:-}${1:+)}: ${__bash_it_log_prefix[@]:-}"
-	__bash_it_log_prefix=(${__bash_it_log_prefix[@]:1})
-}
+logr clone _log_trace
+logr clone _log_debug
+logr clone _log_warning
+logr clone _log_error
 
 function _bash_it_log_prefix_push() {
 	local IFS=$'\t\n' # Avoid word splitting.
@@ -67,10 +60,11 @@ function _bash_it_log_prefix_push() {
 	_log_trace "Begin" "${component_name}"
 }
 
-alias _log_trace=': logr "DEBUG" -t "${__bash_it_log_prefix:-}"'
-alias _log_debug='logr "INFO" -t "${__bash_it_log_prefix:-}"'
-alias _log_warn='logr "WARN" -t "${__bash_it_log_prefix:-}"'
-alias _log_error='logr "ERROR" -t "${__bash_it_log_prefix:-}"'
+function _bash_it_log_prefix_pop() {
+	local IFS=$'\t\n' # Avoid word splitting.
+	_log_trace "End${1:+ (}${1:-}${1:+)}: ${__bash_it_log_prefix[@]:-}"
+	__bash_it_log_prefix=(${__bash_it_log_prefix[@]:1})
+}
 
 function _has_colors() {
 	# Check that stdout is a terminal, and that it has at least 8 colors.
@@ -82,7 +76,7 @@ alias _log_clean_aliases_and_trap="trap - RETURN; unalias source . _log_clean_al
 
 _bash_it_library_finalize_hook+=('trap - RETURN' 'unalias source . _log_clean_aliases_and_trap')
 
-alias source='_bash_it_log_prefix_push && builtin source'
+alias source='_bash_it_log_prefix_push && _log_trace "Loading: ${__bash_it_log_prefix[0]:-${BASH_SOURCE[0]##*/}}" && builtin source'
 alias .=source
 
-trap '_bash_it_log_prefix_pop' RETURN
+trap '_log_trace "Loaded: ${__bash_it_log_prefix[0]:-${BASH_SOURCE[0]##*/}}" && _bash_it_log_prefix_pop' RETURN
