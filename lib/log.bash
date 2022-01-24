@@ -10,8 +10,7 @@ __bi_log_imported="loaded"
 
 source ~/Projects/logr/logr.bash
 BASH_IT_LOG_LEVEL_V="-vvv"
-logr start ${BASH_IT_LOG_LEVEL_V:-} "Bash It"
-((__logr_scope_depth--)) # minus one to account for `lib/log.bash`.
+logr start "${BASH_IT_LOG_LEVEL_V:---}" "Bash It"
 #logr verbose
 
 declare -a __bash_it_log_prefix=("log")
