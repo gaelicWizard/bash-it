@@ -1,5 +1,5 @@
 # shellcheck shell=bash
-# shellcheck disable=SC2034,SC2154
+# shellcheck disable=SC2034
 
 SCM_THEME_PROMPT_DIRTY=" ${bold_yellow?}✗"
 SCM_THEME_PROMPT_CLEAN=" ${bold_green?}✓"
@@ -19,11 +19,22 @@ VIRTUALENV_THEME_PROMPT_SUFFIX=') '
 
 function git_prompt_info() {
 	git_prompt_vars
-	echo -e "$SCM_PREFIX${bold_red?}$SCM_BRANCH$SCM_STATE$SCM_SUFFIX"
+	echo -e "${SCM_PREFIX}${bold_red?}${SCM_BRANCH}${SCM_STATE}${SCM_SUFFIX}"
+}
+
+function venv_prompt() {
+	local python_venv=""
+	# Detect python venv
+	if [[ -n "${CONDA_DEFAULT_ENV}" ]]; then
+		python_venv="($PYTHON_VENV_CHAR${CONDA_DEFAULT_ENV}) "
+	elif [[ -n "${VIRTUAL_ENV}" ]]; then
+		python_venv="($PYTHON_VENV_CHAR$(basename "${VIRTUAL_ENV}")) "
+	fi
+	[[ -n "${python_venv}" ]] && echo "${python_venv}"
 }
 
 function prompt_command() {
-	PS1="$(conda_or_venv_prompt)${bold_green?}➜  ${bold_cyan?}\W${reset_color?}$(scm_prompt_info)${normal?} "
+	PS1="$(venv_prompt)${bold_green?}➜  ${bold_cyan?}\W${reset_color?}$(scm_prompt_info)${normal?} "
 }
 
 PROMPT_COMMAND=prompt_command
