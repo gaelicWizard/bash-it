@@ -98,8 +98,8 @@ function local_setup_file() {
 
 	run ln -s "${BASH_IT?}/aliases/available/a.aliases.bash" "${BASH_IT?}/aliases/enabled/750---a.aliases.bash"
 	assert_link_exist "${BASH_IT?}/aliases/enabled/750---a.aliases.bash"
-	run ln -s "${BASH_IT?}/aliases/available/b.aliases.bash" "${BASH_IT?}/completion/enabled/350---b.completion.bash"
-	assert_link_exist "${BASH_IT?}/completion/enabled/350---b.completion.bash"
+	run ln -s "${BASH_IT?}/aliases/available/b.aliases.bash" "${BASH_IT?}/completion/enabled/950---b.completion.bash"
+	assert_link_exist "${BASH_IT?}/completion/enabled/950---b.completion.bash"
 	run ln -s "${BASH_IT?}/plugins/available/c.plugin.bash" "${BASH_IT?}/plugins/enabled/250---c.plugin.bash"
 	assert_link_exist "${BASH_IT?}/plugins/enabled/250---c.plugin.bash"
 
@@ -149,8 +149,8 @@ function local_setup_file() {
 	run ln -s "${BASH_IT?}/plugins/available/base.plugin.bash" "${BASH_IT?}/plugins/enabled/250---base.plugin.bash"
 	assert_link_exist "${BASH_IT?}/plugins/enabled/250---base.plugin.bash"
 
-	run ln -s "${BASH_IT?}/aliases/available/a.aliases.bash" "${BASH_IT?}/aliases/enabled/350---a.aliases.bash"
-	assert_link_exist "${BASH_IT?}/aliases/enabled/350---a.aliases.bash"
+	run ln -s "${BASH_IT?}/aliases/available/a.aliases.bash" "${BASH_IT?}/aliases/enabled/950---a.aliases.bash"
+	assert_link_exist "${BASH_IT?}/aliases/enabled/950---a.aliases.bash"
 	run ln -s "${BASH_IT?}/aliases/available/b.aliases.bash" "${BASH_IT?}/aliases/enabled/750---b.aliases.bash"
 	assert_link_exist "${BASH_IT?}/aliases/enabled/750---b.aliases.bash"
 	run ln -s "${BASH_IT?}/plugins/available/c.plugin.bash" "${BASH_IT?}/plugins/enabled/250---c.plugin.bash"
@@ -160,8 +160,8 @@ function local_setup_file() {
 	run alias test_alias &> /dev/null
 	assert_failure
 
-	run ln -s "$BASH_IT/aliases/available/a.aliases.bash" "$BASH_IT/aliases/enabled/350---a.aliases.bash"
-	assert_link_exist "$BASH_IT/aliases/enabled/350---a.aliases.bash"
+	run ln -s "$BASH_IT/aliases/available/a.aliases.bash" "$BASH_IT/aliases/enabled/950---a.aliases.bash"
+	assert_link_exist "$BASH_IT/aliases/enabled/950---a.aliases.bash"
 	run ln -s "$BASH_IT/aliases/available/b.aliases.bash" "$BASH_IT/aliases/enabled/750---b.aliases.bash"
 	assert_link_exist "$BASH_IT/aliases/enabled/750---b.aliases.bash"
 	run ln -s "$BASH_IT/plugins/available/c.plugin.bash" "$BASH_IT/plugins/enabled/250---c.plugin.bash"
@@ -290,8 +290,8 @@ function local_setup_file() {
 	run ln -s "${BASH_IT?}/plugins/available/base.plugin.bash" "${BASH_IT?}/enabled/250---base.plugin.bash"
 	assert_link_exist "${BASH_IT?}/enabled/250---base.plugin.bash"
 
-	run ln -s "${BASH_IT?}/aliases/available/a.aliases.bash" "${BASH_IT?}/enabled/350---a.aliases.bash"
-	assert_link_exist "${BASH_IT?}/enabled/350---a.aliases.bash"
+	run ln -s "${BASH_IT?}/aliases/available/a.aliases.bash" "${BASH_IT?}/enabled/950---a.aliases.bash"
+	assert_link_exist "${BASH_IT?}/enabled/950---a.aliases.bash"
 	run ln -s "${BASH_IT?}/aliases/available/b.aliases.bash" "${BASH_IT?}/enabled/750---b.aliases.bash"
 	assert_link_exist "${BASH_IT?}/enabled/750---b.aliases.bash"
 	run ln -s "${BASH_IT?}/plugins/available/c.plugin.bash" "${BASH_IT?}/enabled/250---c.plugin.bash"
