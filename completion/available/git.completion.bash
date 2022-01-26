@@ -6,7 +6,7 @@
 _command_exists git || return
 
 # Don't handle completion if it's already managed
-if complete -p git &> /dev/null; then
+if _completion_exists git; then
 	_log_warning "completion already loaded - this usually means it is safe to stop using this completion"
 	return 0
 fi
