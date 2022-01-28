@@ -23,6 +23,9 @@ else
 	return
 fi
 
+# overriding CONFIG_FILE:
+CONFIG_FILE="${BASH_IT_CONFIG_FILE:-"${CONFIG_FILE}"}"
+
 # possible states:
 # - both .bash* /and/ .bash*.bak, /and/ both config reference `$BASH_IT`: no solution
 # - both config and bak, but only one references `$BASH_IT`: that one
