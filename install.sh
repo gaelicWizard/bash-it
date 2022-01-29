@@ -124,6 +124,10 @@ function _bash-it-install-modify-config() {
 		# backup/new by default
 		_bash-it-install-backup-new
 	fi
+	_bash-it-install-modify-profile
+}
+
+function _bash-it-install-modify-profile() {
 	local choice profile_string=$'if [[ -s ~/.profile ]]; then\n\tsource ~/.profile\nfi\nif [[ $- == *"i"* && -s ~/.bashrc ]]; then\n\tsource ~/.bashrc\nfi'
 	if [[ ! -f ~/.bash_profile ]]; then
 		printf '%s\n' "${profile_string}" > ~/.bash_profile
