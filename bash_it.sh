@@ -25,7 +25,7 @@ _bash_it_log_prefix_push "main"
 # Load libraries
 _log_debug "Loading libraries..."
 for _bash_it_main_file_lib in "${BASH_IT}/lib"/*.bash; do
-	_bash_it_log_section="${_bash_it_lib_file}"
+	_bash_it_log_section="${_bash_it_main_file_lib}"
 	_log_debug "Loading library file..."
 	# shellcheck disable=SC1090
 	source "$_bash_it_main_file_lib"
@@ -63,7 +63,7 @@ _log_debug "Loading custom aliases, completion, plugins..."
 for _bash_it_main_file_type in "aliases" "completion" "plugins"; do
 	_bash_it_main_file_custom="${BASH_IT}/${_bash_it_main_file_type}/custom.${_bash_it_main_file_type}.bash"
 	if [[ -s "${_bash_it_main_file_custom}" ]]; then
-		_bash_it_log_section="${file_type}"
+		_bash_it_log_section="${_bash_it_main_file_type}"
 		_log_debug "Loading component..."
 		# shellcheck disable=SC1090
 		source "${_bash_it_main_file_custom}"
@@ -75,7 +75,7 @@ done
 _log_debug "Loading general custom files..."
 for _bash_it_main_file_custom in "${BASH_IT_CUSTOM}"/*.bash "${BASH_IT_CUSTOM}"/*/*.bash; do
 	if [[ -s "${_bash_it_main_file_custom}" ]]; then
-		_bash_it_log_section="${_bash_it_custom_file}"
+		_bash_it_log_section="${_bash_it_main_file_custom}"
 		_log_debug "Loading custom file..."
 		# shellcheck disable=SC1090
 		source "$_bash_it_main_file_custom"
