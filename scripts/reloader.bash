@@ -20,7 +20,7 @@ if [[ "${1:-}" != "skip" && -d "${BASH_IT?}/enabled" ]]; then
 
 	for _bash_it_reloader_file in "$BASH_IT/enabled"/*"${_bash_it_reloader_type}.bash"; do
 		if [[ -e "${_bash_it_reloader_file}" ]]; then
-			_bash_it_log_section="${_bash_it_config_file}"
+			_bash_it_log_section="${_bash_it_reloader_file}"
 			_log_debug "Loading component..."
 			source "$_bash_it_reloader_file"
 			_log_debug "Loaded."
