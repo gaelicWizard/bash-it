@@ -104,3 +104,5 @@ for _bash_it_library_finalize_f in "${_bash_it_library_finalize_hook[@]:-}"; do
 	_log_debug "Finalized: $_bash_it_library_finalize_f"
 done
 unset "${!_bash_it_library_finalize_@}" "${!_bash_it_main_file_@}"
+
+[[ "${BASH_VERSINFO[0]}" -ge 5 ]] && echo "_Bash It_ spent $(($(echo $BASHPID) - $$)) while starting up ($SECONDS)."
