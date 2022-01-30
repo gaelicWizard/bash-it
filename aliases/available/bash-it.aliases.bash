@@ -22,8 +22,9 @@ alias bshenp="bash-it enable plugin"
 alias bshena="bash-it enable alias"
 alias bshenc="bash-it enable completion"
 
-# BASH_IT_RELOAD_LEGACY is set.
-if [[ -n "${BASH_IT_RELOAD_LEGACY:-}" ]] && ! _command_exists reload; then
-	# shellcheck disable=SC2139
-	alias reload="builtin source '${BASH_IT_BASHRC?}'"
+# Bash It reload alias(es):
+alias bash-it-reload='source "${BASH_IT_BASHRC}"'
+if [[ -n "${BASH_IT_RELOAD_LEGACY:-}" ]]; then
+	_log_trace "Enabling BASH_IT_RELOAD_LEGACY"
+	alias reload='source "${BASH_IT_BASHRC}"'
 fi
