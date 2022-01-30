@@ -42,7 +42,7 @@ done
 
 # Load theme, if a theme was set
 # shellcheck source-path=SCRIPTDIR/themes
-if [[ -n "${BASH_IT_THEME:-}" ]]; then
+if [[ -n "${BASH_IT_THEME:=custom}" ]]; then
 	_log_debug "Loading theme '${BASH_IT_THEME}'."
 
 	# shellcheck disable=SC1090
