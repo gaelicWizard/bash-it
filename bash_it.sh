@@ -37,6 +37,7 @@ for _bash_it_main_file_type in "" "aliases" "plugins" "completion"; do
 	_bash_it_log_section=reloader
 	_log_debug "Loading '${_bash_it_main_file_type}'..."
 	source "${BASH_IT}/scripts/reloader.bash" "${_bash_it_main_file_type:+skip}" "$_bash_it_main_file_type"
+	#_where_from "${BASH_IT}/scripts/reloader.bash"
 done
 
 # Load theme, if a theme was set
@@ -47,10 +48,12 @@ if [[ -n "${BASH_IT_THEME:-}" ]]; then
 	# shellcheck disable=SC1090
 	if [[ -f "${BASH_IT_THEME}" ]]; then
 		source "${BASH_IT_THEME}"
+			#_where_from "${BASH_IT_THEME}"
 	elif [[ -f "$CUSTOM_THEME_DIR/$BASH_IT_THEME/$BASH_IT_THEME.theme.bash" ]]; then
 		source "$CUSTOM_THEME_DIR/$BASH_IT_THEME/$BASH_IT_THEME.theme.bash"
 	elif [[ -f "$BASH_IT/themes/$BASH_IT_THEME/$BASH_IT_THEME.theme.bash" ]]; then
 		source "$BASH_IT/themes/$BASH_IT_THEME/$BASH_IT_THEME.theme.bash"
+			#_where_from "$BASH_IT/themes/$BASH_IT_THEME/$BASH_IT_THEME.theme.bash"
 	fi
 	_bash_it_log_prefix_pop "theme"
 fi
@@ -64,6 +67,7 @@ for _bash_it_main_file_type in "aliases" "completion" "plugins"; do
 		_log_debug "Loading component..."
 		# shellcheck disable=SC1090
 		source "${_bash_it_main_file_custom}"
+		#_where_from "${BASH_IT}/${file_type}/custom.${file_type}.bash"
 	fi
 done
 
@@ -75,6 +79,7 @@ for _bash_it_main_file_custom in "${BASH_IT_CUSTOM}"/*.bash "${BASH_IT_CUSTOM}"/
 		_log_debug "Loading custom file..."
 		# shellcheck disable=SC1090
 		source "$_bash_it_main_file_custom"
+		#_where_from "$_bash_it_config_file"
 	fi
 done
 _bash_it_log_prefix_pop "custom"
@@ -94,6 +99,8 @@ else
 fi
 
 for _bash_it_library_finalize_f in "${_bash_it_library_finalize_hook[@]:-}"; do
+	_log_debug "Finalize hook: $_bash_it_library_finalize_f"
 	eval "${_bash_it_library_finalize_f?}" # Use `eval` to achieve the same behavior as `$PROMPT_COMMAND`.
+	_log_debug "Finalized: $_bash_it_library_finalize_f"
 done
 unset "${!_bash_it_library_finalize_@}" "${!_bash_it_main_file_@}"
