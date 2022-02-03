@@ -156,7 +156,7 @@ ___brainy_prompt_clock() {
 ___brainy_prompt_battery() {
 	! _command_exists battery_percentage \
 		|| [ "${THEME_SHOW_BATTERY}" != "true" ] \
-		|| [ "$(battery_percentage)" = "no" ] && return
+		|| [ -z "$(battery_percentage)" ] && return
 
 	info=$(battery_percentage)
 	color=$bold_green

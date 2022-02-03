@@ -156,7 +156,7 @@ function __powerline_battery_prompt() {
 	local color="" battery_status
 	battery_status="$(battery_percentage 2> /dev/null)"
 
-	if [[ -z "${battery_status}" || "${battery_status}" == "-1" || "${battery_status}" == "no" ]]; then
+	if [[ -z "${battery_status}" || "${battery_status}" == "-1" ]]; then
 		true
 	else
 		if [[ "$((10#${battery_status}))" -le 5 ]]; then

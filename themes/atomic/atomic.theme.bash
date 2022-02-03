@@ -168,7 +168,7 @@ function ___atomic_prompt_battery() {
 	local batp box info
 	! _command_exists battery_percentage \
 		|| [[ "${THEME_SHOW_BATTERY:-}" != "true" ]] \
-		|| [[ "$(battery_percentage)" = "no" ]] && return
+		|| [[ -z "$(battery_percentage)" ]] && return
 
 	batp=$(battery_percentage)
 	if [[ "$batp" -eq 50 || "$batp" -gt 50 ]]; then

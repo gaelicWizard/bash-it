@@ -41,7 +41,7 @@ function setup_command_exists {
   setup_command_exists "fooooo"
 
   run battery_percentage
-  assert_output "no"
+  assert_output ""
 }
 
 #######################
@@ -101,7 +101,7 @@ function setup_pmset {
   setup_pmset ""
 
   run battery_percentage
-  assert_output "-1"
+  assert_output ""
 }
 
 #######################
@@ -182,7 +182,7 @@ function setup_acpi {
   setup_acpi "" ""
 
   run battery_percentage
-  assert_output "-1"
+  assert_output ""
 }
 
 #######################
@@ -256,7 +256,7 @@ function setup_upower {
   setup_upower ""
 
   run battery_percentage
-  assert_output "-1"
+  assert_output ""
 }
 
 #######################
@@ -319,7 +319,7 @@ function setup_ioreg {
   }
 
   run battery_percentage
-  assert_output "-1"
+  assert_output ""
 }
 
 #######################
@@ -379,5 +379,5 @@ function setup_WMIC {
   setup_WMIC ""
 
   run battery_percentage
-  assert_output "-1"
+  assert_output ""
 }

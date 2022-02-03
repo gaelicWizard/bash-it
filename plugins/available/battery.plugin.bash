@@ -45,19 +45,15 @@ function battery_percentage() {
 	elif _command_exists acpi; then
 		command_output=$(acpi -b | awk -F, '/,/{gsub(/ /, "", $0); gsub(/%/,"", $0); print $2}')
 	elif _command_exists pmset; then
-		command_output=$(pmset -g ps | sed -n 's/.*[[:blank:]]+*\(.*%\).*/\1/p' | grep -o '[0-9]\+' | head -1)
+		command_output=$(pmset -g ps | sed -n 's/.*[[:blank:]]+*\(.*\)%.*/\1/p')
 	elif _command_exists ioreg; then
-		command_output=$(ioreg -n AppleSmartBattery -r | awk '$1~/Capacity/{c[$1]=$3} END{OFMT="%05.2f"; max=c["\"MaxCapacity\""]; print (max>0? 100*c["\"CurrentCapacity\""]/max: "?")}' | grep -o '[0-9]\+' | head -1)
+		command_output=$(ioreg -n AppleSmartBattery -r | awk '$1~/Capacity/{c[$1]=$3} END{OFMT="%05.2f"; max=c["\"MaxCapacity\""]; print (max>0? 100*c["\"CurrentCapacity\""]/max: "")}')
 	elif _command_exists WMIC; then
 		command_output=$(WMIC PATH Win32_Battery Get EstimatedChargeRemaining /Format:List | grep -o '[0-9]\+' | head -1)
-	else
-		command_output="no"
 	fi
 
-	if [[ "${command_output}" != "no" ]]; then
-		printf "%02d" "${command_output:--1}"
-	else
-		echo "${command_output}"
+	if [[ -n "${command_output:-}" ]]; then
+		printf "%02d" "${command_output%.*}"
 	fi
 }
 
@@ -78,8 +74,7 @@ function battery_charge() {
 	battery_percentage=$(battery_percentage)
 
 	case $battery_percentage in
-		no)
-			echo ""
+		00)
 			;;
 		9*)
 			echo "${full_color}${f_c}${f_c}${f_c}${f_c}${f_c}${normal?}"
@@ -108,16 +103,7 @@ function battery_charge() {
 		1*)
 			echo "${full_color}${f_c}${depleted_color}${d_c}${d_c}${d_c}${d_c}${normal?}"
 			;;
-		05)
-			echo "${danger_color}${f_c}${depleted_color}${d_c}${d_c}${d_c}${d_c}${normal?}"
-			;;
-		04)
-			echo "${danger_color}${f_c}${depleted_color}${d_c}${d_c}${d_c}${d_c}${normal?}"
-			;;
-		03)
-			echo "${danger_color}${f_c}${depleted_color}${d_c}${d_c}${d_c}${d_c}${normal?}"
-			;;
-		02)
+		05|04|03|02|01)
 			echo "${danger_color}${f_c}${depleted_color}${d_c}${d_c}${d_c}${d_c}${normal?}"
 			;;
 		0*)
