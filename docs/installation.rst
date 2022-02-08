@@ -34,7 +34,7 @@ To achieve this, you can add this snippet in your ``.bash_profile``\ :
 
 .. code-block::
 
-   if [[ -f ~/.bashrc ]]; then
+   if [[ $- == *"i"* && -f ~/.bashrc ]]; then
      source ~/.bashrc
    fi
 
