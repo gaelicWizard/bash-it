@@ -2,21 +2,21 @@
 
 load ../test_helper
 load ../test_helper_libs
-load ../../themes/base.theme
+load ../../lib/theme
 
-@test 'themes base: battery_percentage should not exist' {
+@test 'theme: battery_percentage should not exist' {
   run type -a battery_percentage &> /dev/null
   assert_failure
 }
 
-@test 'themes base: battery_percentage should exist if battery plugin loaded' {
+@test 'theme: battery_percentage should exist if battery plugin loaded' {
   load ../../plugins/available/battery.plugin
 
   run type -a battery_percentage &> /dev/null
   assert_success
 }
 
-@test 'themes base: battery_char should exist' {
+@test 'theme: battery_char should exist' {
   run type -t battery_char
   assert_success
   assert_line "function"
@@ -25,7 +25,7 @@ load ../../themes/base.theme
   assert_line -n 0 ""
 }
 
-@test 'themes base: battery_char should exist if battery plugin loaded' {
+@test 'theme: battery_char should exist if battery plugin loaded' {
   unset -f battery_char
 
   load ../../plugins/available/battery.plugin
@@ -33,7 +33,7 @@ load ../../themes/base.theme
   assert_success
   assert_line "function"
 
-  load ../../themes/base.theme
+  load ../../lib/theme
   run type -t battery_char
   assert_success
   assert_line "function"
@@ -45,7 +45,7 @@ load ../../themes/base.theme
   assert_output --partial 'THEME_BATTERY_PERCENTAGE_CHECK'
 }
 
-@test 'themes base: battery_charge should exist' {
+@test 'theme: battery_charge should exist' {
   run type -a battery_charge &> /dev/null
   assert_success
 
@@ -54,10 +54,10 @@ load ../../themes/base.theme
   assert_line -n 0 ""
 }
 
-@test 'themes base: battery_charge should exist if battery plugin loaded' {
+@test 'theme: battery_charge should exist if battery plugin loaded' {
   unset -f battery_charge
   load ../../plugins/available/battery.plugin
-  load ../../themes/base.theme
+  load ../../lib/theme
 
   run type -a battery_charge &> /dev/null
   assert_success

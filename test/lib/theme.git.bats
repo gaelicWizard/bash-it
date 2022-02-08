@@ -2,8 +2,8 @@
 
 load ../test_helper
 load ../test_helper_libs
-load ../../themes/githelpers.theme
-load ../../themes/base.theme
+load ../../lib/theme.githelpers
+load ../../lib/theme
 
 add_commit() {
   local file_name="general-${RANDOM}"

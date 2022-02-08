@@ -46,15 +46,6 @@ done
 # shellcheck source-path=SCRIPTDIR/themes
 if [[ -n "${BASH_IT_THEME:-}" ]]; then
 	_log_debug "Loading theme '${BASH_IT_THEME}'."
-	BASH_IT_LOG_PREFIX="themes: githelpers: "
-	source "${BASH_IT}/themes/githelpers.theme.bash"
-	BASH_IT_LOG_PREFIX="themes: p4helpers: "
-	source "${BASH_IT}/themes/p4helpers.theme.bash"
-	BASH_IT_LOG_PREFIX="themes: command_duration: "
-	source "${BASH_IT}/themes/command_duration.theme.bash"
-	BASH_IT_LOG_PREFIX="themes: base: "
-	source "${BASH_IT}/themes/base.theme.bash"
-
 	BASH_IT_LOG_PREFIX="lib: appearance: "
 	# appearance (themes) now, after all dependencies
 	# shellcheck source=SCRIPTDIR/lib/appearance.bash

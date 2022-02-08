@@ -18,7 +18,7 @@ function local_setup {
 
   export OLD_PATH="$PATH"
 
-  load ../../themes/base.theme
+  load ../../lib/theme
 }
 
 function local_teardown {

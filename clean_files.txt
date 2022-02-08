@@ -77,12 +77,14 @@ completion/available/wpscan.completion.bash
 
 # libraries
 lib/colors.bash
+lib/command_duration.bash
 lib/helpers.bash
 lib/history.bash
 lib/log.bash
 lib/preexec.bash
 lib/preview.bash
 lib/search.bash
+lib/theme.bash
 lib/utilities.bash
 
 # plugins
@@ -147,7 +149,6 @@ themes/atomic
 themes/axin
 themes/bakke
 themes/barbuk
-themes/base.theme.bash
 themes/binaryanomaly
 themes/bira
 themes/bobby
@@ -155,7 +156,6 @@ themes/bobby-python
 themes/brainy
 themes/brunton
 themes/candy
-themes/command_duration.theme.bash
 themes/easy
 themes/essential
 themes/modern
