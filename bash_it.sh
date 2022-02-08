@@ -22,11 +22,9 @@ _bash_it_library_finalize_hook=()
 # We need to load logging module early in order to be able to log
 source "${BASH_IT}/lib/log.bash"
 
-# libraries, but skip appearance (themes) for now
-_log_debug "Loading libraries(except appearance)..."
-APPEARANCE_LIB="${BASH_IT}/lib/appearance.bash"
+# libraries
+_log_debug "Loading libraries..."
 for _bash_it_main_file_lib in "${BASH_IT}/lib"/*.bash; do
-	[[ "$_bash_it_main_file_lib" == "$APPEARANCE_LIB" ]] && continue
 	_bash-it-log-prefix-by-path "${_bash_it_main_file_lib}"
 	_log_debug "Loading library file..."
 	# shellcheck disable=SC1090
@@ -43,14 +41,16 @@ for _bash_it_main_file_type in "" "aliases" "plugins" "completion"; do
 done
 
 # Load theme, if a theme was set
-# shellcheck source-path=SCRIPTDIR/themes
+# shellcheck source-path=SCRIPTDIR/themes disable=SC1090
 if [[ -n "${BASH_IT_THEME:-}" ]]; then
 	_log_debug "Loading theme '${BASH_IT_THEME}'."
-	BASH_IT_LOG_PREFIX="lib: appearance: "
-	# appearance (themes) now, after all dependencies
-	# shellcheck source=SCRIPTDIR/lib/appearance.bash
-	source "$APPEARANCE_LIB"
-	BASH_IT_LOG_PREFIX="core: main: "
+	if [[ -f ${BASH_IT_THEME} ]]; then
+		source "${BASH_IT_THEME}"
+	elif [[ -f "$CUSTOM_THEME_DIR/$BASH_IT_THEME/$BASH_IT_THEME.theme.bash" ]]; then
+		source "$CUSTOM_THEME_DIR/$BASH_IT_THEME/$BASH_IT_THEME.theme.bash"
+	elif [[ -f "$BASH_IT/themes/$BASH_IT_THEME/$BASH_IT_THEME.theme.bash" ]]; then
+		source "$BASH_IT/themes/$BASH_IT_THEME/$BASH_IT_THEME.theme.bash"
+	fi
 fi
 
 _log_debug "Loading custom aliases, completion, plugins..."
