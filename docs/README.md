@@ -38,15 +38,41 @@ Stop polluting your `~/bin` directory and your `.bashrc` file, fork/clone Bash-i
 
 ## Installation
 
-1) Check out a clone of this repo to a location of your choice, such as
-   ``git clone --depth=1 https://github.com/Bash-it/bash-it.git ~/.bash_it``
-2) Run ``~/.bash_it/install.sh``
+There are currently two recommended ways you can employ to install Bash it
 
-That's it! :smiley:  
+### Direct install
+
+Using bash and curl automagically install Bash it directly from the master repository on github.
+
+Copy and paste the following command anywhere into a shell. Curl will retrieve the install script which then gets parsed and executed by bash. On detection of the direct installation process `install.sh` will first clone the repository into `~/.bash_it` before continuing with the installation.
+
+1. Execute the install script directly from github:
+```
+bash -c "$(curl -s https://raw.github.com/bash-it/bash-it/master/install.sh)"
+```
+
+2. Edit your `~/.bashrc` file in order to customize Bash it.
+
+### Manual install
+
+Using the same `install.sh` script by which the direct install is accomplished after manually cloning the repository first. You would probably want to check bash-it out into the folder `~/.bash_it` but anywhere else you choose also dosen't matter. The `install.sh` script will detect the location it is executed from.
+
+1. Check out a clone of the bash-it repository:
+```
+git clone http://github.com/bash-it/bash-it.git ~/.bash_it
+```
+
+2. Run the `install.sh` script (it automatically backs up your `~/.bashrc`):
+```
+~/.bash_it/install.sh
+```
+
+3. Edit your `~/.bashrc` file in order to customize Bash it.
+
+### That's it! :smiley:
 
 You can check out more components of Bash-it, and customize it to your desire.  
 For more information, see detailed instructions [here](https://bash-it.readthedocs.io/en/latest/installation/).
-
 
 ## Contributing
 

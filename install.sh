@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 # bash-it installer
+# bash -c "$(curl -s https://raw.github.com/bash-it/bash-it/master/install.sh)"
+
+# Be strict when moving and deleting user's files
+set -euo pipefail
 
 # Show how to use this installer
 function _bash-it-install-help() {
@@ -44,9 +48,19 @@ function _bash-it-install-enable() {
 
 # Back up existing profile
 function _bash-it-install-backup-config() {
-	test -w "${HOME?}/${CONFIG_FILE?}" \
-		&& cp -aL "${HOME?}/${CONFIG_FILE?}" "${HOME?}/${CONFIG_FILE?}.bak" \
-		&& echo -e "${echo_green:-}Your original ${CONFIG_FILE?} has been backed up to ${CONFIG_FILE?}.bak${echo_normal:-}"
+	local backup_files backups
+	if [[ -w "${HOME?}/${CONFIG_FILE?}" ]]; then
+		if [[ -s "${HOME?}/${CONFIG_FILE?}.bak" ]]; then
+			backup_files=("${HOME?}/${CONFIG_FILE?}".bak*)
+			backups="${#backup_files[@]}"
+		else
+			backup_files=()
+			backups="" # blank instead of zero
+		fi
+		if cp -aL "${HOME?}/${CONFIG_FILE?}" "${HOME?}/${CONFIG_FILE?}.bak${backups:+.}${backups:-}"; then
+			echo -e "${echo_green:-}Your original ${CONFIG_FILE?} has been backed up to ${CONFIG_FILE?}.bak${echo_normal:-}"
+		fi
+	fi
 }
 
 # Back up existing profile and create new one for bash-it
@@ -171,23 +185,29 @@ done
 
 shift $((OPTIND - 1))
 
-if [[ -n "${silent}" && -n "${interactive}" ]]; then
+if [[ -n "${silent:-}" && -n "${interactive:-}" ]]; then
 	echo -e "${echo_orange:-}Options --silent and --interactive are mutually exclusive. Please choose one or the other.${echo_normal:-}"
 	exit 1
 fi
 
-if [[ -n "${no_modify_config}" && -n "${append_to_config}" ]]; then
+if [[ -n "${no_modify_config:-}" && -n "${append_to_config:-}" ]]; then
 	echo -e "${echo_orange:-}Options --no-modify-config and --append-to-config are mutually exclusive. Please choose one or the other.${echo_normal:-}"
 	exit 1
 fi
 
-BASH_IT="$(cd "${BASH_SOURCE%/*}" && pwd)"
+if [[ "$0" == "bash" ]]; then
+	: "${BASH_IT:="${HOME}/.bash_it"}"
+	[[ -d "${BASH_IT}" ]] && rm -rf "${BASH_IT:?}"
+	git clone http://github.com/bash-it/bash-it.git "${BASH_IT}"
+else
+	: "${BASH_IT:="$(cd "${BASH_SOURCE%/*}" && pwd)"}"
+fi
 
 CONFIG_FILE=".bashrc"
 
 BACKUP_FILE="${CONFIG_FILE?}.bak"
 echo "Installing bash-it"
-if [[ -z "${no_modify_config}" ]]; then
+if [[ -z "${no_modify_config:-}" ]]; then
 	_bash-it-install-modify-config
 fi
 
@@ -195,18 +215,18 @@ fi
 export BASH_IT_AUTOMATIC_RELOAD_AFTER_CONFIG_CHANGE=''
 # Load dependencies for enabling components
 # shellcheck source-path=SCRIPTPATH/vendor/github.com/erichs/composure
-source "${BASH_IT}/vendor/github.com/erichs/composure/composure.sh"
+source "${BASH_IT?}/vendor/github.com/erichs/composure/composure.sh"
 cite _about _param _example _group _author _version
 # shellcheck source-path=SCRIPTDIR/lib
-source "${BASH_IT}/lib/log.bash"
+source "${BASH_IT?}/lib/log.bash"
 # shellcheck source-path=SCRIPTDIR/lib
 source "${BASH_IT?}/lib/utilities.bash"
 # shellcheck source-path=SCRIPTDIR/lib
 source "${BASH_IT?}/lib/helpers.bash"
-# shellcheck source-path=SCRIPTDIR/themes
-source "${BASH_IT?}/themes/colors.theme.bash"
+# shellcheck source-path=SCRIPTDIR/lib
+source "${BASH_IT?}/lib/colors.bash"
 
-if [[ -n $interactive && -z "${silent}" ]]; then
+if [[ -n ${interactive:-} && -z "${silent:-}" ]]; then
 	for type in "aliases" "plugins" "completion"; do
 		echo -e "${echo_green:-}Enabling ${type}${echo_normal:-}"
 		_bash-it-install-enable "$type"
