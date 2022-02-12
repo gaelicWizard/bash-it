@@ -704,7 +704,9 @@ function _on-disable-callback() {
 	_group 'lib'
 
 	local callback="${1}_on_disable"
-	_command_exists "$callback" && "$callback"
+	if _command_exists "$callback"; then
+		"$callback"
+	fi
 }
 
 function _disable-all() {
