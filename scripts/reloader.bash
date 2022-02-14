@@ -27,7 +27,7 @@ if [[ "${1:-}" != "skip" && -d "${BASH_IT?}/enabled" ]]; then
 		else
 			_log_error "Unable to read ${_bash_it_reloader_file}"
 		fi
-	_log_trace "end: ${_bash_it_config_file##*/}"
+	_log_trace "end: ${_bash_it_reloader_file##*/}"
 	done
 fi
 
@@ -38,9 +38,9 @@ if [[ -n "${2:-}" ]] && [[ -d "$BASH_IT/${2}/enabled" ]]; then
 			_log_warning "Using legacy enabling for $2, please update your bash-it version and migrate"
 			for _bash_it_reloader_file in "$BASH_IT/${2}/enabled"/*.bash; do
 				if [[ -e "$_bash_it_reloader_file" ]]; then
-					_bash_it_log_section="${_bash_it_config_file}"
+					_bash_it_log_section="${_bash_it_reloader_file}"
 					_log_debug "Loading component..."
-					# shellcheck source=/dev/null
+					# shellcheck source-path=SCRIPTDIR/enabled:SCRIPTDIR/aliases/enabled:SCRIPTDIR/completion/enabled:SCRIPTDIR/plugins/enabled
 					source "$_bash_it_reloader_file"
 					_log_debug "Loaded."
 				else
