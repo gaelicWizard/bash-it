@@ -1,5 +1,6 @@
 # shellcheck shell=bash
 # shellcheck disable=SC2034 # Expected behavior for themes.
+
 # shellcheck source-path=SCRIPTDIR/../powerline-multiline
 source "${BASH_IT?}/themes/powerline-multiline/powerline-multiline.base.bash"
 

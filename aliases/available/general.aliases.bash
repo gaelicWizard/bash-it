@@ -92,6 +92,6 @@ function catt() {
 # aliases and enable just the ones for Bash-it explicitly:
 # bash-it disable alias general
 # bash-it enable alias bash-it
-source "$BASH_IT/aliases/available/bash-it.aliases.bash"
-source "$BASH_IT/aliases/available/directory.aliases.bash"
-source "$BASH_IT/aliases/available/editor.aliases.bash"
+source "${BASH_IT?}/aliases/available/bash-it.aliases.bash"
+source "${BASH_IT?}/aliases/available/directory.aliases.bash"
+source "${BASH_IT?}/aliases/available/editor.aliases.bash"

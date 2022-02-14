@@ -31,12 +31,12 @@ if [[ "${1:-}" != "skip" && -d "${BASH_IT?}/enabled" ]]; then
 	done
 fi
 
-if [[ -n "${2:-}" ]] && [[ -d "$BASH_IT/${2}/enabled" ]]; then
+if [[ -n "${2:-}" ]] && [[ -d "${BASH_IT?}/${2}/enabled" ]]; then
 	_log_trace "Loading enabled $2 components..."
 	case $2 in
 		aliases | completion | plugins)
 			_log_warning "Using legacy enabling for $2, please update your bash-it version and migrate"
-			for _bash_it_reloader_file in "$BASH_IT/${2}/enabled"/*.bash; do
+			for _bash_it_reloader_file in "${BASH_IT?}/${2}/enabled"/*.bash; do
 				if [[ -e "$_bash_it_reloader_file" ]]; then
 					_bash_it_log_section="${_bash_it_reloader_file}"
 					_log_debug "Loading component..."

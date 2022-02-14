@@ -1,5 +1,6 @@
 # shellcheck shell=bash
 # shellcheck disable=SC2034 # Expected behavior for themes.
+
 # shellcheck source-path=SCRIPTDIR/../gitline
 source "${BASH_IT?}/themes/gitline/powerline.base.bash"
 

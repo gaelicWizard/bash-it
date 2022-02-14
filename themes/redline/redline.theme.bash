@@ -1,7 +1,8 @@
 # shellcheck shell=bash
 # shellcheck disable=SC2034 # Expected behavior for themes.
 
-. "$BASH_IT/themes/powerline/powerline.base.bash"
+# shellcheck source-path=SCRIPTDIR/../powerline
+source "${BASH_IT?}/themes/powerline/powerline.base.bash"
 
 PROMPT_DISTRO_LOGO=" "
 PROMPT_DISTRO_LOGO_COLOR=15
