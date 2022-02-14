@@ -73,15 +73,15 @@ function bash-it() {
 	example '$ bash-it restart'
 	example '$ bash-it profile list|save|load|rm [profile_name]'
 	example '$ bash-it doctor errors|warnings|all'
-	local verb=${1:-}
+	local verb="${1:-}"
 	shift
-	local component=${1:-}
-	shift
-	local func
+	local component="${1:-}"
+	shift 2> /dev/null # Ignore a missing argument at this stage
+	local func="_bash-it-${verb}${component:+-}${component:-}"
 
 	case "$verb" in
 		show)
-			func="_bash-it-$component"
+			func="_bash-it-${component:-show}"
 			;;
 		enable)
 			func="_enable-$component"
@@ -102,28 +102,9 @@ function bash-it() {
 			_bash-it-search "$component" "$@"
 			return
 			;;
-		preview)
-			_bash-it-preview "$component" "$@"
-			return
-			;;
-		update)
-			func="_bash-it-update-$component"
-			;;
-		migrate)
-			func="_bash-it-migrate"
-			;;
-		version)
-			func="_bash-it-version"
-			;;
-		restart)
-			func="_bash-it-restart"
-			;;
-		reload)
-			func="_bash-it-reload"
-			;;
 		*)
-			reference "bash-it"
-			return
+
+
 			;;
 	esac
 
@@ -135,7 +116,7 @@ function bash-it() {
 			if _is_function "${func}es"; then
 				func="${func}es"
 			else
-				echo "oops! $component is not a valid option!"
+
 				reference bash-it
 				return
 			fi
