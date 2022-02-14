@@ -5,8 +5,8 @@
 : "${WHERE_HOOK_SOURCE:=false}"
 : "${WHERE_EXPIRATION:=3600}"
 
-# shellcheck source=../github.com/gaelicWizard/where/_where.bash
-source "${BASH_IT}/vendor/github.com/gaelicWizard/where/_where.bash"
+# shellcheck source-path=SCRIPTDIR/_where.bash
+source "${BASH_IT?}/vendor/github.com/gaelicWizard/where/_where.bash"
 
 function _where_from_here()
 {
