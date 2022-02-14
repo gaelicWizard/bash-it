@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-. "$BASH_IT/themes/powerline-plain/powerline-plain.base.bash"
+# shellcheck source-path=SCRIPTDIR
+source "${BASH_IT?}/themes/powerline-plain/powerline-plain.base.bash"
 
 USER_INFO_SSH_CHAR=${POWERLINE_USER_INFO_SSH_CHAR:="⌁ "}
 USER_INFO_THEME_PROMPT_COLOR=${POWERLINE_USER_INFO_COLOR:=32}

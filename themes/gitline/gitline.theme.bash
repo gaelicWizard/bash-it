@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-. "$BASH_IT/themes/gitline/powerline.base.bash"
+# shellcheck source-path=SCRIPTDIR
+source "${BASH_IT?}/themes/gitline/powerline.base.bash"
 
 #For the logo(Uncomment if you want a logo before your name)
 #PROMPT_DISTRO_LOGO="💻"

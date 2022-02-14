@@ -3,7 +3,7 @@
 # Powerline Naked
 
 # shellcheck source-path=SCRIPTDIR
-source "$BASH_IT/themes/powerline/powerline.base.bash"
+source "${BASH_IT?}/themes/powerline/powerline.base.bash"
 
 function __powerline_left_segment {
 	local OLD_IFS="${IFS}"

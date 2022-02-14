@@ -1,6 +1,7 @@
 # shellcheck shell=bash
 
-source "$BASH_IT/themes/doubletime/doubletime.theme.bash"
+# shellcheck source-path=SCRIPTDIR
+source "${BASH_IT?}/themes/doubletime/doubletime.theme.bash"
 
 function prompt_setter() {
   # Save history

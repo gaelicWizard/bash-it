@@ -1,14 +1,15 @@
 # shellcheck shell=bash
 
-source "$BASH_IT/themes/doubletime/doubletime.theme.bash"
+# shellcheck source-path=SCRIPTDIR/../doubletime
+source "${BASH_IT?}/themes/doubletime/doubletime.theme.bash"
 
 function prompt_setter() {
   # Save history
   _save-and-reload-history 1
   PS1="
-$(clock_prompt) $(scm_char) [$THEME_PROMPT_HOST_COLOR\u@${THEME_PROMPT_HOST}$reset_color] $(virtualenv_prompt)$(ruby_version_prompt)
+$(clock_prompt) $(scm_char) [${THEME_PROMPT_HOST_COLOR:-}\u@${THEME_PROMPT_HOST}${reset_color?}] $(virtualenv_prompt)$(ruby_version_prompt)
 \w
-$(scm_prompt)$reset_color $ "
+$(scm_prompt)${reset_color?} $ "
   PS2='> '
   PS4='+ '
 }
