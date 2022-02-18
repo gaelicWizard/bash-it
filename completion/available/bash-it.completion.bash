@@ -86,10 +86,5 @@ function _bash-it() {
 	esac
 }
 
-# Activate completion for bash-it and its common misspellings
+# Activate completion for bash-it
 complete -F _bash-it bash-it
-complete -F _bash-it bash-ti
-complete -F _bash-it shit
-complete -F _bash-it bashit
-complete -F _bash-it batshit
-complete -F _bash-it bash_it
