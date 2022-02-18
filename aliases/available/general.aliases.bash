@@ -75,10 +75,6 @@ alias rmrf='rm -rf'
 _command_exists 'extract' \
 	&& alias xt='extract'
 
-# sudo editors
-alias svim='sudo "${VISUAL:-vim}"'
-alias snano='sudo "${ALTERNATE_EDITOR:-nano}"'
-
 # Display whatever file is regular file or folder
 function catt() {
 	for i in "$@"; do
