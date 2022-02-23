@@ -4,7 +4,8 @@ about-plugin 'Node.js version manager, https://github.com/nvm-sh/nvm'
 # Load after basher
 # BASH_IT_LOAD_PRIORITY: 260
 
-export NVM_DIR="${NVM_DIR:-${HOME?}/.nvm}"
+: "${NVM_DIR:=${HOME?}/.nvm}"
+export NVM_DIR
 
 if _bash_it_homebrew_check && [[ -s "${BASH_IT_HOMEBREW_PREFIX?}/nvm.sh" ]]; then
 	source "${BASH_IT_HOMEBREW_PREFIX?}/nvm.sh"
