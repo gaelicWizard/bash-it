@@ -43,12 +43,6 @@ done
 # shellcheck source-path=SCRIPTDIR/themes
 if [[ -n "${BASH_IT_THEME:-}" ]]; then
 	_log_debug "Loading theme '${BASH_IT_THEME}'."
-	_bash_it_log_section="githelpers"
-	source "${BASH_IT}/themes/githelpers.theme.bash"
-	_bash_it_log_section="p4helpers"
-	source "${BASH_IT}/themes/p4helpers.theme.bash"
-	_bash_it_log_section="base"
-	source "${BASH_IT}/themes/base.theme.bash"
 
 	# shellcheck disable=SC1090
 	if [[ -f "${BASH_IT_THEME}" ]]; then
