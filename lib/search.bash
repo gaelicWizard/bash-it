@@ -215,12 +215,10 @@ function _bash-it-search-component() {
 	local -a partial_terms=()  # terms that should be included if they match partially
 	local -a negative_terms=() # negated partial terms that should be excluded
 
-	local term line
+	local term
 
 	local -a component_list=()
-	while IFS='' read -r line; do
-		component_list+=("$line")
-	done < <(_bash-it-component-list "${component}")
+	IFS=$'\n' read -d '' -ra component_list < <(_bash-it-component-list "${component}")
 
 	for term in "${terms[@]}"; do
 		local search_term="${term:1}"
@@ -233,17 +231,13 @@ function _bash-it-search-component() {
 				exact_terms+=("${search_term}")
 			fi
 		else
-			while IFS='' read -r line; do
-				partial_terms+=("$line")
-			done < <(_bash-it-component-list-matching "${component}" "${term}")
+			IFS=$'\n' read -d '' -ra partial_terms < <(_bash-it-component-list-matching "${component}" "${term}")
 
 		fi
 	done
 
 	local -a total_matches=()
-	while IFS='' read -r line; do
-		total_matches+=("$line")
-	done < <(_bash-it-array-dedup "${exact_terms[@]:-}" "${partial_terms[@]:-}")
+	IFS=$'\n' read -r total_matches < <(_bash-it-array-dedup "${exact_terms[@]:-}" "${partial_terms[@]:-}")
 
 	local -a matches=()
 	for match in "${total_matches[@]}"; do
@@ -272,9 +266,7 @@ function _bash-it-search-result() {
 	local -a matches=()
 
 	# Discard any empty arguments
-	while IFS='' read -r line; do
-		[[ -n "${line}" ]] && matches+=("$line")
-	done < <(_bash-it-array-dedup "${@}")
+	IFS=$'\n' read -d '' -ra matches < <(_bash-it-array-dedup "${@}")
 
 	if [[ "${BASH_IT_SEARCH_USE_COLOR}" == "true" ]]; then
 		color_component='\e[1;34m'
