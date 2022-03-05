@@ -29,4 +29,4 @@ _bash-it-gopath-pathmunge() {
 		pathmunge "${apath}/bin" || true
 	done
 }
-_bash-it-gopath-pathmunge
+_bash-it-gopath-pathmunge || true

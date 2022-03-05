@@ -3,7 +3,6 @@
 # shellcheck disable=SC2034
 #
 # Initialize Bash It
-BASH_IT_LOG_PREFIX="core: main: "
 : "${BASH_IT:=${BASH_SOURCE%/*}}"
 : "${BASH_IT_CUSTOM:=${BASH_IT}/custom}"
 : "${CUSTOM_THEME_DIR:="${BASH_IT_CUSTOM}/themes"}"
@@ -21,39 +20,36 @@ _bash_it_library_finalize_hook=()
 
 # We need to load logging module early in order to be able to log
 source "${BASH_IT}/lib/log.bash"
+_bash_it_log_prefix_push "main"
 
 # Load libraries
 _log_debug "Loading libraries..."
 for _bash_it_main_file_lib in "${BASH_IT}/lib"/*.bash; do
-	_bash-it-log-prefix-by-path "${_bash_it_main_file_lib}"
+	_bash_it_log_section="${_bash_it_lib_file}"
 	_log_debug "Loading library file..."
 	# shellcheck disable=SC1090
 	source "$_bash_it_main_file_lib"
-	BASH_IT_LOG_PREFIX="core: main: "
 done
 
 # Load the global "enabled" directory, then enabled aliases, completion, plugins
 # "_bash_it_main_file_type" param is empty so that files get sourced in glob order
 for _bash_it_main_file_type in "" "aliases" "plugins" "completion"; do
-	BASH_IT_LOG_PREFIX="core: reloader: "
-	_log_debug "Loading \"${_bash_it_main_file_type}\"..."
+	_bash_it_log_section=reloader
+	_log_debug "Loading '${_bash_it_main_file_type}'..."
 	source "${BASH_IT}/scripts/reloader.bash" "${_bash_it_main_file_type:+skip}" "$_bash_it_main_file_type"
-	_log_debug "Loaded."
-	BASH_IT_LOG_PREFIX="core: main: "
 done
 
 # Load theme, if a theme was set
 # shellcheck source-path=SCRIPTDIR/themes
 if [[ -n "${BASH_IT_THEME:-}" ]]; then
 	_log_debug "Loading theme '${BASH_IT_THEME}'."
-	BASH_IT_LOG_PREFIX="themes: githelpers: "
+	_bash_it_log_section="githelpers"
 	source "${BASH_IT}/themes/githelpers.theme.bash"
-	BASH_IT_LOG_PREFIX="themes: p4helpers: "
+	_bash_it_log_section="p4helpers"
 	source "${BASH_IT}/themes/p4helpers.theme.bash"
-	BASH_IT_LOG_PREFIX="themes: base: "
+	_bash_it_log_section="base"
 	source "${BASH_IT}/themes/base.theme.bash"
 
-	BASH_IT_LOG_PREFIX="lib: appearance: "
 	# shellcheck disable=SC1090
 	if [[ -f "${BASH_IT_THEME}" ]]; then
 		source "${BASH_IT_THEME}"
@@ -62,33 +58,35 @@ if [[ -n "${BASH_IT_THEME:-}" ]]; then
 	elif [[ -f "$BASH_IT/themes/$BASH_IT_THEME/$BASH_IT_THEME.theme.bash" ]]; then
 		source "$BASH_IT/themes/$BASH_IT_THEME/$BASH_IT_THEME.theme.bash"
 	fi
+	_bash_it_log_prefix_pop "theme"
 fi
 
+_bash_it_log_prefix_push "custom"
 _log_debug "Loading custom aliases, completion, plugins..."
 for _bash_it_main_file_type in "aliases" "completion" "plugins"; do
 	_bash_it_main_file_custom="${BASH_IT}/${_bash_it_main_file_type}/custom.${_bash_it_main_file_type}.bash"
 	if [[ -s "${_bash_it_main_file_custom}" ]]; then
-		_bash-it-log-prefix-by-path "${_bash_it_main_file_custom}"
+		_bash_it_log_section="${file_type}"
 		_log_debug "Loading component..."
 		# shellcheck disable=SC1090
 		source "${_bash_it_main_file_custom}"
 	fi
-	BASH_IT_LOG_PREFIX="core: main: "
 done
 
 # Custom
 _log_debug "Loading general custom files..."
 for _bash_it_main_file_custom in "${BASH_IT_CUSTOM}"/*.bash "${BASH_IT_CUSTOM}"/*/*.bash; do
 	if [[ -s "${_bash_it_main_file_custom}" ]]; then
-		_bash-it-log-prefix-by-path "${_bash_it_main_file_custom}"
+		_bash_it_log_section="${_bash_it_custom_file}"
 		_log_debug "Loading custom file..."
 		# shellcheck disable=SC1090
 		source "$_bash_it_main_file_custom"
 	fi
-	BASH_IT_LOG_PREFIX="core: main: "
 done
+_bash_it_log_prefix_pop "custom"
 
 if [[ -n "${PROMPT:-}" ]]; then
+_log_trace "Setting prompt..."
 	PS1="${PROMPT}"
 fi
 
@@ -99,12 +97,6 @@ elif [[ -d /Applications/Preview.app ]]; then
 	PREVIEW="/Applications/Preview.app"
 else
 	PREVIEW="less"
-fi
-
-# BASH_IT_RELOAD_LEGACY is set.
-if [[ -n "${BASH_IT_RELOAD_LEGACY:-}" ]] && ! _command_exists reload; then
-	# shellcheck disable=SC2139
-	alias reload="builtin source '${BASH_IT_BASHRC?}'"
 fi
 
 for _bash_it_library_finalize_f in "${_bash_it_library_finalize_hook[@]:-}"; do

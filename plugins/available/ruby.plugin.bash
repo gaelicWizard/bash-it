@@ -1,5 +1,4 @@
 # shellcheck shell=bash
-cite about-plugin
 about-plugin 'ruby and rubygems specific functions and settings'
 
 # Make commands installed with 'gem install --user-install' available

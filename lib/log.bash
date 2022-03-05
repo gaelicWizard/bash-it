@@ -2,6 +2,12 @@
 #
 # A collection of logging functions.
 
+# Avoid duplicate inclusion
+if [[ "${__bi_log_imported:-}" == "loaded" ]]; then
+	return 0
+fi
+__bi_log_imported="loaded"
+
 # Declare log severity levels, matching syslog numbering
 : "${BASH_IT_LOG_LEVEL_FATAL:=1}"
 : "${BASH_IT_LOG_LEVEL_ERROR:=3}"
@@ -11,8 +17,17 @@
 : "${BASH_IT_LOG_LEVEL_TRACE:=7}"
 readonly "${!BASH_IT_LOG_LEVEL_@}"
 
-function _bash-it-log-prefix-by-path() {
-	local component_path="${1?${FUNCNAME[0]}: path specification required}"
+declare -a __bash_it_log_prefix=("log" "${__bash_it_log_prefix[@]:-core}")
+
+function _bash_it_log_prefix_pop() {
+	_log_trace "End${1:+ (}${1:-}${1:+)}"
+	unset -v '__bash_it_log_prefix[0]'
+	__bash_it_log_prefix=("${__bash_it_log_prefix[@]:-default}")
+}
+
+function _bash_it_log_prefix_push() {
+	local component_path="${_bash_it_log_section:-${1:-default}}"
+	unset _bash_it_log_section
 	local without_extension component_directory
 	local component_filename component_type component_name
 
@@ -39,8 +54,12 @@ function _bash-it-log-prefix-by-path() {
 		fi
 	fi
 
-	# shellcheck disable=SC2034
-	BASH_IT_LOG_PREFIX="${component_type:-lib}: $component_name"
+	if [[ -r "$component_path" ]]; then
+		__bash_it_log_prefix=("${component_type:-default}: $component_name" "${__bash_it_log_prefix[@]}")
+	elif [[ -n "$component_path" ]]; then
+		__bash_it_log_prefix=("${component_name}" "${__bash_it_log_prefix[@]}")
+	fi
+	_log_trace "Begin" "${component_name}"
 }
 
 function _has_colors() {
@@ -48,53 +67,65 @@ function _has_colors() {
 	[[ -t 1 && "${CLICOLOR:=$(tput colors 2> /dev/null)}" -ge 8 ]]
 }
 
-function _bash-it-log-message() {
-	: _about 'Internal function used for logging, uses BASH_IT_LOG_PREFIX as a prefix'
-	: _param '1: color of the message'
-	: _param '2: log level to print before the prefix'
-	: _param '3: message to log'
-	: _group 'log'
+function _bash_it_log_message() {
+	about 'Internal function used for logging, uses __bash_it_log_prefix as a prefix'
+	param '1: color of the message'
+	param '2: severity of the message'
+	param '3: message to log'
+	group 'log'
 
-	local prefix="${BASH_IT_LOG_PREFIX:-default}"
-	local color="${1-${echo_cyan:-}}"
-	local level="${2:-TRACE}"
-	local message="${level%: }: ${prefix%: }: ${3?}"
-	if _has_colors; then
-		printf '%b%s%b\n' "${color}" "${message}" "${echo_normal:-}"
-	else
-		printf '%s\n' "${message}"
-	fi
+	message="($SECONDS) $2: ${__bash_it_log_prefix[1]:-}${__bash_it_log_prefix[1]:+: }${__bash_it_log_prefix[0]:-default}: $3"
+	_has_colors && echo -e "$1${message}${echo_normal:-}" || echo -e "${message}"
+}
+
+function _log_trace() {
+	[[ "${BASH_IT_LOG_LEVEL:-0}" -ge ${BASH_IT_LOG_LEVEL_TRACE?} ]] || return 0
+
+	about 'log a message by echoing to the screen. needs BASH_IT_LOG_LEVEL >= BASH_IT_LOG_LEVEL_TRACE'
+	param '1: message to log'
+	param '2: message origin'
+	example '$ _log_trace "Entering theme plugin"'
+	group 'log'
+
+	_bash_it_log_message "${echo_blue:-}" "TRACE" "$1${2:+ (}${2:-}${2:+)}"
 }
 
 function _log_debug() {
-	: _about 'log a debug message by echoing to the screen. needs BASH_IT_LOG_LEVEL >= BASH_IT_LOG_LEVEL_INFO'
-	: _param '1: message to log'
-	: _example '$ _log_debug "Loading plugin git..."'
-	: _group 'log'
+	[[ "${BASH_IT_LOG_LEVEL:-0}" -ge ${BASH_IT_LOG_LEVEL_INFO?} ]] || return 0
 
-	if [[ "${BASH_IT_LOG_LEVEL:-0}" -ge "${BASH_IT_LOG_LEVEL_INFO?}" ]]; then
-		_bash-it-log-message "${echo_green:-}" "DEBUG: " "$1"
-	fi
+	about 'log a debug message by echoing to the screen. needs BASH_IT_LOG_LEVEL >= BASH_IT_LOG_LEVEL_INFO'
+	param '1: message to log'
+	example '$ _log_debug "Loading plugin git..."'
+	group 'log'
+
+	_bash_it_log_message "${echo_green:-}" "DEBUG" "$1"
 }
 
 function _log_warning() {
-	: _about 'log a message by echoing to the screen. needs BASH_IT_LOG_LEVEL >= BASH_IT_LOG_LEVEL_WARNING'
-	: _param '1: message to log'
-	: _example '$ _log_warning "git binary not found, disabling git plugin..."'
-	: _group 'log'
+	[[ "${BASH_IT_LOG_LEVEL:-0}" -ge ${BASH_IT_LOG_LEVEL_WARNING?} ]] || return 0
 
-	if [[ "${BASH_IT_LOG_LEVEL:-0}" -ge "${BASH_IT_LOG_LEVEL_WARNING?}" ]]; then
-		_bash-it-log-message "${echo_yellow:-}" " WARN: " "$1"
-	fi
+	about 'log a message by echoing to the screen. needs BASH_IT_LOG_LEVEL >= BASH_IT_LOG_LEVEL_WARNING'
+	param '1: message to log'
+	example '$ _log_warning "git binary not found, disabling git plugin..."'
+	group 'log'
+
+	_bash_it_log_message "${echo_yellow:-}" " WARN" "$1"
 }
 
 function _log_error() {
-	: _about 'log a message by echoing to the screen. needs BASH_IT_LOG_LEVEL >= BASH_IT_LOG_LEVEL_ERROR'
-	: _param '1: message to log'
-	: _example '$ _log_error "Failed to load git plugin..."'
-	: _group 'log'
+	[[ "${BASH_IT_LOG_LEVEL:-0}" -ge ${BASH_IT_LOG_LEVEL_ERROR?} ]] || return 0
 
-	if [[ "${BASH_IT_LOG_LEVEL:-0}" -ge "${BASH_IT_LOG_LEVEL_ERROR?}" ]]; then
-		_bash-it-log-message "${echo_red:-}" "ERROR: " "$1"
-	fi
+	about 'log a message by echoing to the screen. needs BASH_IT_LOG_LEVEL >= BASH_IT_LOG_LEVEL_ERROR'
+	param '1: message to log'
+	example '$ _log_error "Failed to load git plugin..."'
+	group 'log'
+
+	_bash_it_log_message "${echo_red:-}" "ERROR" "$1"
 }
+
+# Aliases have no scope, so we can manipulate the global environment.
+alias _log_clean_aliases_and_trap="trap - RETURN; unalias source . _log_clean_aliases_and_trap; _log_trace 'Log trace unregistered.'"
+_bash_it_library_finalize_hook+=('trap - RETURN' 'unalias source . _log_clean_aliases_and_trap' '_log_trace "Log trace unregistered."')
+alias source='_bash_it_log_prefix_push "${BASH_SOURCE##*/}" && builtin source'
+alias .=source
+trap _bash_it_log_prefix_pop RETURN

@@ -21,3 +21,9 @@ alias bshsch="bash-it search"
 alias bshenp="bash-it enable plugin"
 alias bshena="bash-it enable alias"
 alias bshenc="bash-it enable completion"
+
+# BASH_IT_RELOAD_LEGACY is set.
+if [[ -n "${BASH_IT_RELOAD_LEGACY:-}" ]] && ! _command_exists reload; then
+	# shellcheck disable=SC2139
+	alias reload="builtin source '${BASH_IT_BASHRC?}'"
+fi
