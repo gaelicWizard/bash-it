@@ -4,10 +4,10 @@
 #To set color for foreground and background
 function set_color() {
 	local fg='' bg=''
-	if [[ "${1:-}" != "-" ]]; then
+	if [[ "${1:--}" != "-" ]]; then
 		fg="38;5;${1}"
 	fi
-	if [[ "${2:-}" != "-" ]]; then
+	if [[ "${2:--}" != "-" ]]; then
 		bg="48;5;${2}"
 		[[ -n "${fg}" ]] && bg=";${bg}"
 	fi
@@ -34,12 +34,35 @@ function __powerline_user_info_prompt() {
 			fi
 			;;
 		*)
-			if [[ -n "${SSH_CLIENT:-}" ]] || [[ -n "${SSH_CONNECTION:-}" ]]; then
+			if [[ -n "${SSH_CLIENT:-}" || -n "${SSH_CONNECTION:-}" ]]; then
 				user_info="${USER_INFO_SSH_CHAR-${POWERLINE_USER_INFO_SSH_CHAR-"⌁ "}}${user_info}"
 			fi
 			;;
 	esac
 	echo "${user_info}|${color}|${fg_color}"
+}
+
+function __powerline_terraform_prompt() {
+	local terraform_workspace=""
+
+	if [[ -d .terraform ]]; then
+		terraform_workspace="$(terraform_workspace_prompt)"
+		[[ -n "${terraform_workspace}" ]] && echo "${TERRAFORM_CHAR-${POWERLINE_TERRAFORM_CHAR-"❲t❳ "}}${terraform_workspace}|${TERRAFORM_THEME_PROMPT_COLOR-${POWERLINE_TERRAFORM_COLOR-"161"}}"
+	fi
+}
+
+function __powerline_gcloud_prompt() {
+	local active_gcloud_account=""
+
+	active_gcloud_account="$(active_gcloud_account_prompt)"
+	[[ -n "${active_gcloud_account}" ]] && echo "${GCLOUD_CHAR-${POWERLINE_GCLOUD_CHAR-"❲G❳ "}}${active_gcloud_account}|${GCLOUD_THEME_PROMPT_COLOR-${POWERLINE_GCLOUD_COLOR-"161"}}"
+}
+
+function __powerline_node_prompt() {
+	local node_version=""
+
+	node_version="$(node_version_prompt)"
+	[[ -n "${node_version}" ]] && echo "${NODE_CHAR-${POWERLINE_NODE_CHAR-="❲n❳ "}}${node_version}|${NODE_THEME_PROMPT_COLOR-${POWERLINE_NODE_COLOR-"22"}}"
 }
 
 function __powerline_terraform_prompt() {
@@ -217,7 +240,7 @@ function __powerline_aws_profile_prompt() {
 function __powerline_in_toolbox_prompt() {
 	local -i fg_color=206
 
-	if [[ -f /run/.containerenv ]] && [[ -f /run/.toolboxenv ]]; then
+	if [[ -f /run/.containerenv && -f /run/.toolboxenv ]]; then
 		echo "${IN_TOOLBOX_THEME_PROMPT_TEXT?}|${IN_TOOLBOX_THEME_PROMPT_COLOR?}|${fg_color}"
 	fi
 }
@@ -319,7 +342,8 @@ function __powerline_prompt_command() {
 
 	[[ "${last_status}" -ne 0 ]] && __powerline_left_segment "$(__powerline_last_status_prompt "${last_status}")"
 
-	if [[ -n "${LEFT_PROMPT:-}" ]] && [[ "${POWERLINE_COMPACT_AFTER_LAST_SEGMENT:-0}" -eq 0 ]]; then
+	if [[ -n "${LEFT_PROMPT:-}" && "${POWERLINE_COMPACT_AFTER_LAST_SEGMENT:-0}" -eq 0 ]]; then
+		LEFT_PROMPT+="$(set_color "${LAST_SEGMENT_COLOR}" -)${separator_char}${normal?}"
 		__powerline_left_last_segment_padding
 	fi
 
