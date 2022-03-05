@@ -48,8 +48,9 @@ done
 # "_bash_it_main_file_type" param is empty so that files get sourced in glob order
 for _bash_it_main_file_type in "" "aliases" "plugins" "completion"; do
 	BASH_IT_LOG_PREFIX="core: reloader: "
-	# shellcheck disable=SC2140
-	source "${BASH_IT}/scripts/reloader.bash" ${_bash_it_main_file_type:+"skip" "$_bash_it_main_file_type"}
+	_log_debug "Loading '${_bash_it_main_file_type}'..."
+	source "${BASH_IT}/scripts/reloader.bash" "${_bash_it_main_file_type:+skip}" "$_bash_it_main_file_type"
+	_log_debug "Loaded."
 	BASH_IT_LOG_PREFIX="core: main: "
 done
 
