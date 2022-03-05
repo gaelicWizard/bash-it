@@ -1,8 +1,8 @@
 # shellcheck shell=bash
 # shellcheck disable=SC2034 # Expected behavior for themes.
 
-# shellcheck source=../../themes/powerline/powerline.base.bash
-. "$BASH_IT/themes/powerline/powerline.base.bash"
+# shellcheck source-path=SCRIPTDIR/../powerline
+source "${BASH_IT?}/themes/powerline/powerline.base.bash"
 
 PROMPT_CHAR=${POWERLINE_PROMPT_CHAR:=""}
 POWERLINE_LEFT_SEPARATOR=${POWERLINE_LEFT_SEPARATOR:=""}
