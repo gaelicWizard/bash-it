@@ -1,11 +1,13 @@
 # shellcheck shell=bash
-# shellcheck disable=SC2034,SC1091 # Expected behavior for themes.
+# shellcheck disable=SC2034 # Expected behavior for themes.
+
+# shellcheck source-path=SCRIPTDIR/../powerline
 source "${BASH_IT?}/themes/powerline/powerline.base.bash"
 
 function __powerline_left_segment {
 	local OLD_IFS="${IFS}" params=()
 	# shellcheck disable=SC2206 # not needed because we are splitting on "|"
-	IFS="|" params=($1)
+	IFS="|" params=("$1")
 	IFS="${OLD_IFS}"
 	local separator=""
 	local pad_before_segment=" "
