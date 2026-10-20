@@ -271,7 +271,7 @@ function setup_ioreg {
 
 	# shellcheck disable=SC2317
 	function ioreg {
-		printf "\"MaxCapacity\" = 100\n\"CurrentCapacity\" = %s" "${percent}"
+		printf '"MaxCapacity" = 100\n"CurrentCapacity" = %s' "${percent}"
 	}
 }
 
