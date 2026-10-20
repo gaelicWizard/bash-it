@@ -38,7 +38,7 @@ __pwdln() {
 }
 
 __vagrantinvestigate() {
-	if [ -f "${PWD}/.vagrant" ] || [ -d "${PWD}/.vagrant" ]; then
+	if [[ -f "${PWD}/.vagrant" || -d "${PWD}/.vagrant" ]]; then
 		echo "${PWD}/.vagrant"
 		return 0
 	else

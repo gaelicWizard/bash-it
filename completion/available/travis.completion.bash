@@ -1,5 +1,4 @@
 # shellcheck shell=bash
-# shellcheck disable=SC1090
 
 # Make sure travis is installed
 _bash-it-completion-helper-necessary travis || :

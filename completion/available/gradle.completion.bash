@@ -25,29 +25,25 @@ url "https://gradle.org/"
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# Bash breaks words on : by default. Subproject tasks have ':'
-# Avoid inaccurate completions for subproject tasks
-COMP_WORDBREAKS="${COMP_WORDBREAKS//:/}"
-
 function __gradle-set-project-root-dir() {
-	project_root_dir="$(_bash-it-find-in-ancestor "settings.gradle" "gradlew")"
+	_gradle-project-root="$(_bash-it-find-in-ancestor "settings.gradle" "gradlew")"
 	return "$?"
 }
 
 __gradle-init-cache-dir() {
-	cache_dir="$HOME/.gradle/completion"
-	mkdir -p "$cache_dir"
+	_gradle-cache-dir="$HOME/.gradle/completion"
+	mkdir -p "$_gradle-cache-dir"
 }
 
 __gradle-set-build-file() {
 	# Look for default build script in the settings file (settings.gradle by default)
 	# Otherwise, default is the file 'build.gradle' in the current directory.
-	gradle_build_file="$project_root_dir/build.gradle"
-	if [[ -f "$project_root_dir/settings.gradle" ]]; then
+	gradle_build_file="$_gradle-project-root/build.gradle"
+	if [[ -f "$_gradle-project-root/settings.gradle" ]]; then
 		local build_file_name
-		build_file_name=$(grep "^rootProject\.buildFileName" "$project_root_dir/settings.gradle" \
+		build_file_name=$(grep "^rootProject\.buildFileName" "$_gradle-project-root/settings.gradle" \
 			| sed -n -e "s/rootProject\.buildFileName = [\'\"]\(.*\)[\'\"]/\1/p")
-		gradle_build_file="$project_root_dir/${build_file_name:-build.gradle}"
+		gradle_build_file="$_gradle-project-root/${build_file_name:-build.gradle}"
 	fi
 }
 
@@ -59,9 +55,9 @@ __gradle-set-cache-name() {
 __gradle-set-files-checksum() {
 	# Cache MD5 sum of all Gradle scripts and modified timestamps
 	if _command_exists md5; then
-		gradle_files_checksum=$(md5 -q -s "$(xargs ls -o < "$cache_dir/$cache_name" 2> /dev/null)")
+		gradle_files_checksum=$(md5 -q -s "$(xargs ls -o < "$_gradle-cache-dir/$cache_name" 2> /dev/null)")
 	elif _command_exists md5sum; then
-		gradle_files_checksum=$(xargs ls -o < "$cache_dir/$cache_name" 2> /dev/null | md5sum | awk '{print $1}')
+		gradle_files_checksum=$(xargs ls -o < "$_gradle-cache-dir/$cache_name" 2> /dev/null | md5sum | awk '{print $1}')
 	else
 		echo "Cannot generate completions as neither md5 nor md5sum exist on \$PATH"
 	fi
@@ -72,15 +68,15 @@ __gradle-generate-script-cache() {
 	local cache_ttl_mins=${GRADLE_CACHE_TTL_MINUTES:-30240}
 	local script_exclude_pattern=${GRADLE_COMPLETION_EXCLUDE_PATTERN:-"/(build|integTest|out)/"}
 
-	if [[ ! $(find "$cache_dir/$cache_name" -mmin "-$cache_ttl_mins" 2> /dev/null) ]]; then
+	if [[ ! $(find "$_gradle-cache-dir/$cache_name" -mmin "-$cache_ttl_mins" 2> /dev/null) ]]; then
 		# Cache all Gradle scripts
 		local gradle_build_scripts
 		gradle_build_scripts=$(
-			find "$project_root_dir" -type f \
+			find "$_gradle-project-root" -type f \
 				\( -name "*.gradle" -o -name "*.gradle.kts" \) 2> /dev/null \
 				| grep -E -v "$script_exclude_pattern"
 		)
-		printf "%s\n" "${gradle_build_scripts[@]}" > "$cache_dir/$cache_name"
+		printf "%s\n" "${gradle_build_scripts[@]}" > "$_gradle-cache-dir/$cache_name"
 	fi
 }
 
@@ -190,8 +186,8 @@ __gradle-generate-tasks-cache() {
 
 	# Use Gradle wrapper when it exists.
 	local gradle_cmd="gradle"
-	if [[ -x "$project_root_dir/gradlew" ]]; then
-		gradle_cmd="$project_root_dir/gradlew"
+	if [[ -x "$_gradle-project-root/gradlew" ]]; then
+		gradle_cmd="$_gradle-project-root/gradlew"
 	fi
 
 	# Run gradle to retrieve possible tasks and cache.
@@ -234,12 +230,12 @@ __gradle-generate-tasks-cache() {
 		done
 	fi
 
-	printf "%s\n" "${gradle_all_tasks[@]}" > "$cache_dir/$gradle_files_checksum"
-	echo "$gradle_files_checksum" > "$cache_dir/$cache_name.md5"
+	printf "%s\n" "${gradle_all_tasks[@]}" > "$_gradle-cache-dir/$gradle_files_checksum"
+	echo "$gradle_files_checksum" > "$_gradle-cache-dir/$cache_name.md5"
 }
 
 __gradle-completion-init() {
-	local cache_dir cache_name gradle_build_file gradle_files_checksum project_root_dir
+	local _gradle-cache-dir cache_name gradle_build_file gradle_files_checksum _gradle-project-root
 
 	local OLDIFS="$IFS"
 	local IFS=$'\n'
@@ -260,7 +256,11 @@ __gradle-completion-init() {
 }
 
 _gradle() {
-	local cache_dir cache_name gradle_build_file gradle_files_checksum project_root_dir
+	local _gradle-cache-dir cache_name gradle_build_file gradle_files_checksum _gradle-project-root
+	# Bash breaks words on : by default. Subproject tasks have ':'
+	# Avoid inaccurate completions for subproject tasks
+	COMP_WORDBREAKS="${COMP_WORDBREAKS//:/}"
+
 	local cur=${COMP_WORDS[COMP_CWORD]}
 	# Set bash internal field separator to '\n'
 	# This allows us to provide descriptions for options and tasks
@@ -283,18 +283,18 @@ _gradle() {
 			__gradle-set-files-checksum
 
 			# The cache key is md5 sum of all gradle scripts, so it's valid if it exists.
-			if [[ -f "$cache_dir/$cache_name.md5" ]]; then
+			if [[ -f "$_gradle-cache-dir/$cache_name.md5" ]]; then
 				local cached_checksum
-				cached_checksum="$(cat "$cache_dir/$cache_name.md5")"
+				cached_checksum="$(cat "$_gradle-cache-dir/$cache_name.md5")"
 				local -a cached_tasks
 				if [[ -z $cur ]]; then
 					while IFS='' read -r line; do
 						cached_tasks+=("$line")
-					done < "$cache_dir/$cached_checksum"
+					done < "$_gradle-cache-dir/$cached_checksum"
 				else
 					while IFS='' read -r line; do
 						cached_tasks+=("$line")
-					done < <(grep "^$cur" "$cache_dir/$cached_checksum")
+					done < <(grep "^$cur" "$_gradle-cache-dir/$cached_checksum")
 				fi
 				while IFS='' read -r line; do
 					COMPREPLY+=("$line")
@@ -304,8 +304,8 @@ _gradle() {
 			fi
 
 			# Regenerate tasks cache in the background
-			if [[ $gradle_files_checksum != "$(cat "$cache_dir/$cache_name.md5")" ||
-			! -f "$cache_dir/$gradle_files_checksum" ]]; then
+			if [[ $gradle_files_checksum != "$(cat "$_gradle-cache-dir/$cache_name.md5")" ||
+			! -f "$_gradle-cache-dir/$gradle_files_checksum" ]]; then
 				(__gradle-generate-tasks-cache &> /dev/null &)
 			fi
 		else
