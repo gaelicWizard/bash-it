@@ -3,12 +3,6 @@ cite about-plugin
 about-plugin 'source into environment when cding to directories'
 url "https://github.com/Bash-it/bash-it"
 
-if [[ -n "${ZSH_VERSION}" ]]; then
-	__array_offset=0
-else
-	__array_offset=1
-fi
-
 function autoenv_init() {
 	local homes _file
 	local -a _files
@@ -28,7 +22,7 @@ function autoenv_init() {
 	_file=${#_files[@]}
 	while ((_file > 0)); do
 		#shellcheck disable=SC1090
-		source "${_files[_file - __array_offset]}"
+		source "${_files[_file]}"
 		: $((_file -= 1))
 	done
 }
