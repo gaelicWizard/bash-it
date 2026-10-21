@@ -13,7 +13,7 @@ BASH_IT="{{BASH_IT}}"
 # Lock and Load a custom theme file.
 # Leave empty to disable theming.
 # location "$BASH_IT"/themes/
-export BASH_IT_THEME='bobby'
+BASH_IT_THEME='bobby'
 
 # Some themes can show whether `sudo` has a current token or not.
 # Set `$THEME_CHECK_SUDO` to `true` to check every prompt:
@@ -49,6 +49,16 @@ TODO="t"
 #SCM_GIT_GITSTATUS_DIR="$HOME/gitstatus"
 # per default gitstatus uses 2 times as many threads as CPU cores, you can change this here if you must
 #export GITSTATUS_NUM_THREADS=8
+
+# Set Xterm/screen/Tmux title with only a short hostname.
+# Uncomment this (or set SHORT_HOSTNAME to something else),
+# Will otherwise fall back on $HOSTNAME.
+#SHORT_HOSTNAME=$(hostname -s)
+
+# Set Xterm/screen/Tmux title with only a short username.
+# Uncomment this (or set SHORT_USER to something else),
+# Will otherwise fall back on $USER.
+#SHORT_USER=${USER:0:8}
 
 # If your theme use command duration, uncomment this to
 # enable display of last command duration.
