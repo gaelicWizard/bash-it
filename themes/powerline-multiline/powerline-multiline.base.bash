@@ -49,7 +49,7 @@ function __powerline_right_first_segment_padding() {
 }
 
 function __powerline_last_status_prompt() {
-	if [[ "${1}" -ne 0 ]]; then
+	if [[ "${1:-0}" -ne 0 ]]; then
 		printf '%b %s %b' "$(set_color "${LAST_STATUS_THEME_PROMPT_COLOR-"52"}" -)" "${1}" "${normal?}"
 	fi
 }
