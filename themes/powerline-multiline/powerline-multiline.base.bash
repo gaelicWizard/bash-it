@@ -56,7 +56,7 @@ function __powerline_last_status_prompt() {
 
 function __powerline_prompt_command() {
 	local last_status="$?" ## always the first
-	local beginning_of_line='\[\e[B\]'
+	local beginning_of_line='\[\e[G\]'
 	local move_cursor_rightmost='\e[500C'
 	local info prompt_color segment prompt
 
