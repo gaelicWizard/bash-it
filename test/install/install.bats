@@ -8,6 +8,7 @@ function local_setup() {
 
 function local_setup_file() {
 	export BASH_IT_CONFIG_FILE=.bashrc
+	set -euo pipefail
 }
 
 @test "install: verify that the install script exists" {
