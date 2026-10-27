@@ -1,4 +1,5 @@
 # shellcheck shell=bash
+cite about-plugin
 about-plugin 'load nodenv, if you are using it'
 url "https://github.com/nodenv/nodenv"
 
@@ -8,9 +9,8 @@ if [[ -d "${NODENV_ROOT:=$HOME/.nodenv}/bin" ]]; then
 fi
 
 if ! _binary_exists nodenv; then
-	_log_warning "Unable to locage 'nodenv'."
-	return 1
+	_bash-it-plugin-self-disable nodenv "Unable to locate 'nodenv'."
+	return 0
 fi
 
-# shellcheck disable=SC1090
-source < <(nodenv init - bash)
+eval "$(nodenv init - bash)"

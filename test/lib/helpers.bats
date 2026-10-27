@@ -191,6 +191,52 @@ function local_setup() {
 	assert [ ! -L "${BASH_IT?}/enabled/225---nvm.plugin.bash" ]
 }
 
+@test "helpers: _bash-it-plugin-self-disable warns and disables an enabled plugin" {
+	run _enable-plugin "nvm"
+	assert_link_exist "${BASH_IT?}/enabled/225---nvm.plugin.bash"
+
+	run _bash-it-plugin-self-disable "nvm" "Unable to locate 'nvm'."
+	assert_output --partial 'nvm disabled.'
+	assert [ ! -L "${BASH_IT?}/enabled/225---nvm.plugin.bash" ]
+}
+
+@test "helpers: a plugin whose binary is missing disables itself and loads cleanly" {
+	local plugin
+	_binary_exists() { return 1; }
+	_command_exists() { return 1; }
+	for plugin in basher direnv fasd fzf goenv hub less-pretty-cat nodenv percol plenv rbenv textmate thefuck zoxide; do
+		_enable-plugin "${plugin}" &> /dev/null
+		run source "${BASH_IT?}/plugins/available/${plugin}.plugin.bash"
+		assert_success
+		assert [ ! -L "${BASH_IT?}/enabled/"*"---${plugin}.plugin.bash" ]
+	done
+}
+
+@test "helpers: plugins evaluate the init code printed by their tool" {
+	local plugin tool
+	mkdir -p "${BATS_TEST_TMPDIR}/bin"
+	for tool in basher direnv goenv hub jump nodenv plenv pyenv rbenv zoxide; do
+		printf '#!/bin/sh\necho "_FAKE_INIT_%s=ran"\n' "${tool}" > "${BATS_TEST_TMPDIR}/bin/${tool}"
+		chmod +x "${BATS_TEST_TMPDIR}/bin/${tool}"
+	done
+	PATH="${BATS_TEST_TMPDIR}/bin:${PATH}"
+	export HOME="${BATS_TEST_TMPDIR}"
+	for plugin in basher direnv goenv hub jump nodenv plenv pyenv rbenv zoxide; do
+		# shellcheck disable=SC1090 # plugin path is dynamic
+		source "${BASH_IT?}/plugins/available/${plugin}.plugin.bash"
+		local var="_FAKE_INIT_${plugin}"
+		assert_equal "${!var-}" "ran"
+	done
+}
+
+@test "helpers: the cht-sh plugin disables itself when cht.sh is already installed" {
+	_binary_exists() { return 0; }
+	_enable-plugin "cht-sh" &> /dev/null
+	run source "${BASH_IT?}/plugins/available/cht-sh.plugin.bash"
+	assert_success
+	assert [ ! -L "${BASH_IT?}/enabled/"*"---cht-sh.plugin.bash" ]
+}
+
 @test "helpers: disable the nvm plugin if it was enabled with a priority, but in the component-specific directory" {
 	run ln -s "${BASH_IT?}/plugins/available/nvm.plugin.bash" "${BASH_IT?}/plugins/enabled/225---nvm.plugin.bash"
 	assert_link_exist "${BASH_IT?}/plugins/enabled/225---nvm.plugin.bash"

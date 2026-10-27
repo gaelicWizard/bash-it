@@ -1,4 +1,5 @@
 # shellcheck shell=bash
+cite about-plugin
 about-plugin 'load rbenv, if you are using it'
 url "https://github.com/rbenv/rbenv"
 
@@ -7,8 +8,8 @@ export RBENV_ROOT
 pathmunge "$RBENV_ROOT/bin"
 
 if ! _binary_exists rbenv; then
-	_log_warning "Unable to locage 'rbenv'."
-	return 1
+	_bash-it-plugin-self-disable rbenv "Unable to locate 'rbenv'."
+	return 0
 fi
 
-source < <(rbenv init - bash)
+eval "$(rbenv init - bash)"

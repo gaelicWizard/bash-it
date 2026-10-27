@@ -8,8 +8,8 @@ url "https://www.jenv.be/"
 # - Check if installed manually to $JENV_ROOT
 # - Check if installed manually to $HOME
 if ! _command_exists jenv && ! [[ -n "${JENV_ROOT:-}" && -x "$JENV_ROOT/bin/jenv" ]] && ! [[ -x "$HOME/.jenv/bin/jenv" ]]; then
-	_log_warning "Unable to locate 'jenv'."
-	return 1
+	_bash-it-plugin-self-disable jenv "Unable to locate 'jenv'."
+	return 0
 fi
 
 # Set JENV_ROOT, if not already set

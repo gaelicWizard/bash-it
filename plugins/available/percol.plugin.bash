@@ -15,8 +15,8 @@ url "https://github.com/mooz/percol"
 ## C-r to search&select from history
 
 if ! _binary_exists percol; then
-	_log_warning "Unable to locate 'percol'."
-	return 1
+	_bash-it-plugin-self-disable percol "Unable to locate 'percol'."
+	return 0
 fi
 
 if [[ ${BASH_VERSINFO[0]} -lt 4 ]]; then

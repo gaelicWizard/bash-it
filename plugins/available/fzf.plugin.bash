@@ -8,7 +8,7 @@ url "https://github.com/junegunn/fzf"
 
 if ! _bash-it-component-item-is-enabled plugin blesh; then
 	if [[ -r ~/.fzf.bash ]]; then
-		# shellcheck disable=SC1091
+		# shellcheck disable=SC1090
 		source ~/.fzf.bash
 	elif [[ -r "${XDG_CONFIG_HOME:-$HOME/.config}/fzf/fzf.bash" ]]; then
 		# shellcheck disable=SC1091
@@ -18,8 +18,8 @@ fi # only sources the keybindings and integration if blesh is not integrated alr
 
 # No need to continue if the command is not present
 if ! _binary_exists fzf; then
-	_log_warning "unable to initialize without '$_' installed."
-	return 1
+	_bash-it-plugin-self-disable fzf "unable to initialize without 'fzf' installed."
+	return 0
 fi
 
 if [[ -z ${FZF_DEFAULT_COMMAND+x} ]] && _command_exists fd; then

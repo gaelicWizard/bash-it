@@ -953,6 +953,17 @@ function _on-disable-callback() {
 	fi
 }
 
+function _bash-it-plugin-self-disable() {
+	_about 'Warns and disables a plugin whose prerequisites are missing'
+	_param '1: plugin name'
+	_param '2: reason'
+	_example '_bash-it-plugin-self-disable fzf "Unable to locate '"'"'fzf'"'"'."'
+	_group 'lib'
+
+	_log_warning "${1?}: ${2?}"
+	_disable-plugin "${1}"
+}
+
 function _disable-all() {
 	_about 'disables all bash_it components'
 	_example '$ _disable-all'

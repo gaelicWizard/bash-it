@@ -1,10 +1,11 @@
 # shellcheck shell=bash
+cite about-plugin
 about-plugin 'pygmentize instead of cat to terminal if possible'
 url "https://pygments.org/"
 
 if ! _binary_exists pygmentize; then
-	_log_warning "${BASH_SOURCE[0]##*/}: unable to initialize without '$_' installed."
-	return 1
+	_bash-it-plugin-self-disable less-pretty-cat "Unable to locate 'pygmentize'."
+	return 0
 fi
 
 # pigmentize cat and less outputs - call them ccat and cless to avoid that

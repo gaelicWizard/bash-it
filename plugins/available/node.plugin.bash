@@ -1,11 +1,12 @@
 # shellcheck shell=bash
+cite about-plugin
 about-plugin 'Node.js helper functions'
 url "https://nodejs.org/"
 
 # Check that we have npm
 if ! _binary_exists npm; then
-	_log_warning "Unable to locage 'npm'."
-	return 1
+	_bash-it-plugin-self-disable node "Unable to locate 'npm'."
+	return 0
 fi
 
 # Ensure local modules are preferred in PATH

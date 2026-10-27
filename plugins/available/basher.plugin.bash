@@ -1,4 +1,5 @@
 # shellcheck shell=bash
+cite about-plugin
 about-plugin 'initializes basher, the shell package manager'
 url "https://github.com/basherpm/basher"
 
@@ -8,10 +9,9 @@ if ! _command_exists basher; then
 	if [[ -x "$HOME/.basher/bin/basher" ]]; then
 		pathmunge "$HOME/.basher/bin"
 	else
-		_log_warning 'basher not found'
+		_bash-it-plugin-self-disable basher "Unable to locate 'basher'."
 		return 0
 	fi
 fi
 
-# shellcheck disable=SC1090
-source < <(basher init - bash)
+eval "$(basher init - bash)"

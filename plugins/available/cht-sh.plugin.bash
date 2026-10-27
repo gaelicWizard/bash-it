@@ -5,9 +5,9 @@ about-plugin 'Simplify `curl cht.sh/<query>` to `cht.sh <query>`'
 url "https://cht.sh/"
 
 # Play nicely if user already installed cht.sh cli tool
-if _binary_exists cht.sh ; then
-	_log_warning "You have already installed 'cht.sh', so it's safe to disable this plugin."
-	return 1
+if _binary_exists cht.sh; then
+	_bash-it-plugin-self-disable cht-sh "You have already installed 'cht.sh', so it's safe to disable this plugin."
+	return 0
 fi
 
 function cht.sh() {
@@ -21,7 +21,7 @@ function cht.sh() {
 	example '$ cht.sh rust :list'
 	group 'cht-sh'
 
-		# Separate arguments with '/', preserving spaces within them
+	# Separate arguments with '/', preserving spaces within them
 	local query
 	query=$(
 		IFS=/

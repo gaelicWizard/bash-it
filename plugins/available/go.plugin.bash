@@ -9,8 +9,8 @@ url "https://golang.org/"
 # Test `go version` because goenv creates shim scripts that will be found in PATH
 # but do not always resolve to a working install.
 if ! _binary_exists go || ! go version &> /dev/null; then
-	_log_warning "Unable to locate a working 'go'."
-	return 1
+	_bash-it-plugin-self-disable go "Unable to locate a working 'go'."
+	return 0
 fi
 
 : "${GOROOT:=$(go env GOROOT)}"
