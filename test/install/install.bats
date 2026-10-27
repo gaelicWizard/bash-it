@@ -100,6 +100,7 @@ function local_setup_file() {
 	echo "test file content" > "$HOME/.profile"
 
 	run ./install.sh --silent
+	assert_success
 
 	assert_file_exist "$HOME/.profile"
 	assert_file_not_exist "$HOME/.bash_profile"
@@ -122,6 +123,7 @@ function local_setup_file() {
 	echo "test file content" > "$HOME/.profile"
 
 	run ./install.sh --silent
+	assert_success
 
 	assert_file_exist "$HOME/.bash_profile"
 
@@ -139,6 +141,7 @@ function local_setup_file() {
 	cd "$BASH_IT"
 
 	run ./install.sh --silent
+	assert_success
 
 	assert_file_exist "$HOME/.bash_profile"
 
@@ -152,6 +155,7 @@ function local_setup_file() {
 	cd "$BASH_IT"
 
 	run ./install.sh --silent
+	assert_success
 
 	assert_file_exists "$HOME/.bash_profile"
 
@@ -164,6 +168,7 @@ function local_setup_file() {
 
 	touch "$HOME/.profile"
 	run ./install.sh --silent
+	assert_success
 
 	assert_file_exists "$HOME/.profile"
 

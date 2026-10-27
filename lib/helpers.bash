@@ -424,7 +424,12 @@ function _bash-it-doctor-check-profile-sourcing-grep() {
 	[[ ! -f "$profile_file" ]] && return 1
 
 	# Look for common patterns that source .bashrc
-	command grep -qE '(source|\.)\s+(~|\$HOME|"\$?{?HOME}?"?)?/\.bashrc' "$profile_file"
+	# Explicit if/return: on bash 3.2.57 (macOS 14), a function whose last command is a
+	# failing `command <external>` aborts the caller's `if` under `set -e`.
+	if command grep -qE '(source|\.)\s+(~|\$HOME|"\$?{?HOME}?"?)?/\.bashrc' "$profile_file"; then
+		return 0
+	fi
+	return 1
 }
 
 function _bash-it-doctor-check-profile-sourcing-test() {
